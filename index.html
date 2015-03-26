@@ -8,9 +8,9 @@
   <script src="bower_components/angularjs/angular.js"></script>
   <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
   <!-- Vendor specific deps -->
-  <script src="app/vendor/rdflib.js/rdflib.js"></script>
   <script src="app/vendor/common.js"></script>
-  <!-- App -->
+  <script src="app/vendor/rdflib.js/rdflib.js"></script>
+  <script src="app/vendor/sha256.js"></script>  <!-- App -->
   <script src="app/app.js"></script>
 
   <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
@@ -212,7 +212,7 @@
 
 
 
-
+var paymentProvider = 'https://klaranet.com/d/user/';
 
 
   // Listen to WebIDAuth events
@@ -392,7 +392,6 @@
 
 
             $('#webcredit').text(wc);
-            $('#webcreditModal').modal('show');
 
 
             var hash = CryptoJS.SHA256(webid).toString();
@@ -405,10 +404,10 @@
             }
 
 
-            putFile('https://klaranet.com:8888/user/' + hash + '/2', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid +'> ; <https://w3id.org/cc#destination> <' + destination + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
+            putFile(paymentProvider + hash + '/2', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid +'> ; <https://w3id.org/cc#destination> <' + destination + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
 
 
-            console.log('https://klaranet.com:8888/user/' + hash + '/2', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid + '> ; <https://w3id.org/cc#destination> <' + destination + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
+            console.log(paymentProvider + hash + '/2', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid + '> ; <https://w3id.org/cc#destination> <' + destination + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
 
 
             setTimeout(update, 2000);
@@ -446,7 +445,7 @@
 
 
             $('#webcredit').text(wc);
-            $('#webcreditModal').modal('show');
+            console.log(wc);
 
 
             var hash = CryptoJS.SHA256(webid).toString();
@@ -458,10 +457,10 @@
               xhr.send(data);
             }
 
-            putFile('https://klaranet.com:8888/user/' + hash + '/1', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid +'> ; <https://w3id.org/cc#destination> <' + address + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
+            putFile(paymentProvider + hash + '/1', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid +'> ; <https://w3id.org/cc#destination> <' + address + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
 
 
-            console.log('https://klaranet.com:8888/user/' + hash + '/1', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid + '> ; <https://w3id.org/cc#destination> <' + address + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
+            console.log(paymentProvider + hash + '/1', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid + '> ; <https://w3id.org/cc#destination> <' + address + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
 
 
             setTimeout(update, 2000);
