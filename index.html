@@ -404,14 +404,13 @@ var paymentProvider = 'https://klaranet.com/d/user/';
             }
 
 
-            putFile(paymentProvider + hash + '/2', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid +'> ; <https://w3id.org/cc#destination> <' + destination + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
+            putFile(paymentProvider + hash + '/2', wc);
 
 
-            console.log(paymentProvider + hash + '/2', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid + '> ; <https://w3id.org/cc#destination> <' + destination + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
+            console.log(wc);
 
 
             setTimeout(update, 2000);
-            $('.nav-tabs li:eq(1) a').tab('show');
 
 
           });
@@ -457,10 +456,15 @@ var paymentProvider = 'https://klaranet.com/d/user/';
               xhr.send(data);
             }
 
-            putFile(paymentProvider + hash + '/1', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid +'> ; <https://w3id.org/cc#destination> <' + address + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
+
+            var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
+            wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
+            wc += '  <https://w3id.org/cc#destination> \n    <' + address + '> ;\n';
+            wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
+            wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#mark> .\n';
 
 
-            console.log(paymentProvider + hash + '/1', '<> a <https://w3id.org/cc#Credit> ; <https://w3id.org/cc#source> <' + webid + '> ; <https://w3id.org/cc#destination> <' + address + '> ; <https://w3id.org/cc#amount> "' + amount + '" . ');
+            console.log(paymentProvider + hash + '/1', wc);
 
 
             setTimeout(update, 2000);
