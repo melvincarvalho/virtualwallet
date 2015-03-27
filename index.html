@@ -531,7 +531,7 @@
         for( var i=0; i<data.length; i++) {
           data[i].counterparty = data[i]['source'];
           var parity = 'plus';
-          if (counterparty === webid) {
+          if (data[i].counterparty === webid) {
             data[i].counterparty = data[i]['destination'];
             parity = 'minus';
           }
