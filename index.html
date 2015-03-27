@@ -176,7 +176,6 @@
   document.querySelector('#mediaQuery').addEventListener('core-media-change',
   function(e) {
     document.body.classList.toggle('core-narrow', e.detail.matches);
-    //document.querySelector('#scrollableTabs').updateBar();
   });
 
   </script>
@@ -207,17 +206,22 @@
 
   var g = $rdf.graph();
   var f = $rdf.fetcher(g);
-
+  var notify = false;
 
 
 
   document.querySelector('paper-tabs').selected = 0;
 
   var template = {};
+  template.tx = [];
+  var subs = [];
   var paymentProvider = 'https://klaranet.com/d/user/';
+  var webid;
 
 
 
+  var ldpc = paymentProvider + '5edbedfea2005c9feca6c014a6d8b2237d1e54c4113155621e2d7ecb7427c42b' + '/';
+  var wss = 'wss://' + ldpc.split('/')[2];
 
 
 
@@ -225,6 +229,7 @@
   // init
   var init = function() {
 
+    connectToSocket(wss,  ldpc +',meta', subs);
 
 
     // Event listener for login (from child iframe)
@@ -235,7 +240,7 @@
     // Listen to message from child window
     eventListener('WebIDAuth',function(e) {
 
-      var webid = e.detail.user;
+      webid = e.detail.user;
       console.log('WebID is : ' + webid);
 
       if(!webid) return;
@@ -245,60 +250,8 @@
       $('webid-login').hide();
 
 
-      function update() {
-        console.log('updating');
 
-        // get balance
-        var balanceURI = "http://klaranet.com/balance?uri=" + encodeURIComponent(webid);
-        var jqxhr = $.ajax( balanceURI )
-        .done(function(data) {
-          $('#loginmain').hide();
-          $('#amount').text('Balance: ' + data);
-        })
-        .fail(function() {
-          console.log('could not get balance');
-        });
-
-        // get history
-        var txURI = "http://klaranet.com/tx?uri=" + encodeURIComponent(webid);
-        var jqxhr = $.ajax( txURI )
-        .done(function(data) {
-          $('#txmain').hide();
-
-          var table = '';
-          if(data.length>0) {
-            table += ('<table vocab="https://w3id.org/cc#" class="table table-striped table-bordered table-hover"><thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>');
-          }
-
-          for( var i=0; i<data.length; i++) {
-            var counterparty = data[i]['source'];
-            var parity = 'plus';
-            if (counterparty === webid) {
-              counterparty = data[i]['destination'];
-              parity = 'minus';
-            }
-            table +=('<tr>');
-            table +=('<td><time class="timestamp" is="relative-time" datetime="'+data[i]['timestamp']+'"></time></td>');
-            table +=('<td>' + counterparty + '</td>');
-            table +=('<td class="'+parity+'" style="background-color:#FFFF99" >' + data[i]['amount'] + '</td>');
-            table +=('<td>' + data[i]['description'] + '</td>');
-            table +=('</tr>');
-          }
-
-
-          if(data.length>0) {
-            table +=('</table>');
-          }
-          $('#txtable').empty().append(table);
-
-        })
-        .fail(function() {
-          console.log('could not get tx history');
-        });
-        document.querySelector('paper-tabs').selected = 1;
-      }
-
-      update();
+      render();
 
       // fetch user data
       f.nowOrWhenFetched(webid.split('#')[0],undefined,function(ok, body){
@@ -404,7 +357,7 @@
               }
             });
 
-            setTimeout(update, 3000);
+            setTimeout(render, 3000);
 
 
           });
@@ -471,7 +424,7 @@
               }
             });
 
-            setTimeout(update, 2000);
+            setTimeout(render, 2000);
 
 
 
@@ -490,25 +443,161 @@
         console.log(name);
         console.log(address);
 
+
+
+
+
+
+
+
+
+
       });
+
+
+
 
 
     },false);
 
 
+    function connectToSocket(socket, sub, subs) {
 
-    // render form
-    $('#source').focus();
-    $('#result').attr('rows', 10);
+      // socket
+      if ( subs.indexOf(sub) !== -1 ) {
+        console.log('Already subscribed to : ' + sub);
+      } else {
+        console.log("Opening socket to : " + socket);
+        subs.push(sub);
+        var socket = new WebSocket(socket);
+
+        socket.onopen = function(){
+          console.log(this);
+          //var today = new Date().toISOString().substr(0,10);
+          //var sub = 'sub ' + getChannel(template.settings.ldpc, template.settings.type, today) +',meta';
+          //var sub = 'sub ' + getChannel(template.settings.ldpc, template.settings.type, today) +',meta';
+          console.log(sub);
+          this.send('sub ' + sub);
+        }
+
+        socket.onmessage = function(msg){
+          console.log('Incoming message : ');
+          console.log(msg);
+          var today = new Date().toISOString().substr(0,10);
+
+          render();
+
+          Notification.requestPermission(function (permission) {
+            // If the user is okay, let's create a notification
+            if (permission === "granted") {
+              notify = true;
+            }
+          });
+        }
+      }
+    }
+
+
+
+    function render() {
+      console.log('updating');
+
+      // get balance
+      var balanceURI = "http://klaranet.com/balance?uri=" + encodeURIComponent(webid);
+      var jqxhr = $.ajax( balanceURI )
+      .done(function(data) {
+        $('#loginmain').hide();
+        $('#amount').text('Balance: ' + data);
+      })
+      .fail(function() {
+        console.log('could not get balance');
+      });
+
+      // get history
+      var txURI = "http://klaranet.com/tx?uri=" + encodeURIComponent(webid);
+      var jqxhr = $.ajax( txURI )
+      .done(function(data) {
+        $('#txmain').hide();
+
+        var len = template.tx.length;
+        template.tx = [];
+
+        var table = '';
+        if(data.length>0) {
+          table += ('<table vocab="https://w3id.org/cc#" class="table table-striped table-bordered table-hover"><thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>');
+        }
+
+        var counterparty;
+        var amount;
+        for( var i=0; i<data.length; i++) {
+          counterparty = data[i]['source'];
+          var parity = 'plus';
+          if (counterparty === webid) {
+            data[i].counterparty = data[i]['destination'];
+            parity = 'minus';
+          }
+          amount = data[i]['amount'];
+          table +=('<tr>');
+          table +=('<td><time class="timestamp" is="relative-time" datetime="'+data[i]['timestamp']+'"></time></td>');
+          table +=('<td>' + data[i].counterparty + '</td>');
+          table +=('<td class="'+parity+'" style="background-color:#FFFF99" >' + amount + '</td>');
+          table +=('<td>' + data[i]['description'] + '</td>');
+          table +=('</tr>');
+          template.tx.push(data);
+        }
+
+
+        if(data.length>0) {
+          table +=('</table>');
+        }
+        $('#txtable').empty().append(table);
+        if (len && len < data.length) {
+
+          if(notify){
+            var notification = new Notification('Incoming Payment! (' + data[0].amount + ')',
+              {'icon': "https://cdn1.iconfinder.com/data/icons/app-tab-bar-icons-for-ios/30/User_login.png",
+              "body" : 'With : ' + data[0].counterparty });
+              notify = false;
+
+              notification.onclick = function(x) {
+                try {
+                  window.focus();
+                  this.cancel();
+                }
+                catch (ex) {
+                }
+              };
+
+              setTimeout(function(){
+                notification.close()
+              }, 10000);
+
+            }
+
+          }
+
+
+
+        })
+        .fail(function() {
+          console.log('could not get tx history');
+        });
+        document.querySelector('paper-tabs').selected = 1;
+      }
+
+
+      // render form
+      $('#source').focus();
+      $('#result').attr('rows', 10);
 
 
 
 
-  }
+    }
 
-  $(document).ready(init);
-  </script>
+    $(document).ready(init);
+    </script>
 
 
-</body>
-</html>
+  </body>
+  </html>
