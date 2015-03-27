@@ -62,7 +62,7 @@
 
     <div class="bottom fit" horizontal layout>
 
-      <paper-tabs selected="0" flex style="max-width: 600px;">
+      <paper-tabs selected="{{selected}}" flex style="max-width: 600px;">
 
 
 
@@ -81,7 +81,7 @@
 
   </core-toolbar>
 
-  <core-pages selected="home">
+  <core-pages selected="{{selected}}">
 
 
     <div class="tab-pane active" id="balance">
@@ -182,6 +182,7 @@
 
 
   <script>
+  var selected = 0;
 
   // Globals
   var __kb;
@@ -209,7 +210,7 @@
 
 
 
-
+  document.querySelector('paper-tabs').selected = 0;
 
 
 var paymentProvider = 'https://klaranet.com/d/user/';
@@ -310,6 +311,7 @@ var paymentProvider = 'https://klaranet.com/d/user/';
         .fail(function() {
           console.log('could not get tx history');
         });
+        document.querySelector('paper-tabs').selected = 1;
       }
 
       update();
@@ -418,8 +420,7 @@ var paymentProvider = 'https://klaranet.com/d/user/';
         			}
         		});
 
-
-            setTimeout(update, 2000);
+            setTimeout(update, 3000);
 
 
           });
