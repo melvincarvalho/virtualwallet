@@ -527,10 +527,9 @@
           table += ('<table vocab="https://w3id.org/cc#" class="table table-striped table-bordered table-hover"><thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>');
         }
 
-        var counterparty;
         var amount;
         for( var i=0; i<data.length; i++) {
-          counterparty = data[i]['source'];
+          data[i].counterparty = data[i]['source'];
           var parity = 'plus';
           if (counterparty === webid) {
             data[i].counterparty = data[i]['destination'];
