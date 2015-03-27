@@ -106,7 +106,7 @@
       <div class="tab-pane" id="history">
 
         <div id="history">
-          <span id="txmain">You do not yet have any marking history</span>
+          <span id="txmain">You do not yet have any transaction history</span>
           <span id="txtable"></span>
 
         </div>
@@ -236,6 +236,8 @@
 
       var webid = e.detail.user;
       console.log('WebID is : ' + webid);
+
+      if(!webid) return;
 
 
       localStorage.setItem('webid', e.detail.user);
@@ -474,7 +476,7 @@
 
 
         } else {
-          alert('Please add a bitmark address to your profile');
+          alert('Please add a crypto currency address to your profile.');
         }
 
 
