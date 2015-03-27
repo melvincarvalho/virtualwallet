@@ -28,6 +28,7 @@
   <link rel="import" href="bower_components/paper-fab/paper-fab.html">
   <link rel="import" href="bower_components/paper-tab/paper-tab.html">
   <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+  <script src="bower_components/time-elements/time-elements.js"></script>
 
   <link rel="import" href="login.html">
 
@@ -212,7 +213,7 @@
 
   document.querySelector('paper-tabs').selected = 0;
 
-
+  var template = {};
   var paymentProvider = 'https://klaranet.com/d/user/';
 
 
@@ -266,15 +267,20 @@
 
           var table = '';
           if(data.length>0) {
-            table += ('<table vocab="https://w3id.org/cc#" class="table table-striped table-bordered table-hover"><thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Destination</th><th>Why</th></tr></thead>');
+            table += ('<table vocab="https://w3id.org/cc#" class="table table-striped table-bordered table-hover"><thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>');
           }
 
           for( var i=0; i<data.length; i++) {
+            var counterparty = data[i]['source'];
+            var parity = 'plus';
+            if (counterparty === webid) {
+              counterparty = data[i]['destination'];
+              parity = 'minus';
+            }
             table +=('<tr>');
-            table +=('<td>' + data[i]['timestamp'] + '</td>');
-            table +=('<td>' + data[i]['source'] + '</td>');
-            table +=('<td class="plus" style="background-color:#FFFF99" >' + data[i]['amount'] + '</td>');
-            table +=('<td>' + data[i]['destination'] + '</td>');
+            table +=('<td><time class="timestamp" is="relative-time" datetime="'+data[i]['timestamp']+'"></time></td>');
+            table +=('<td>' + counterparty + '</td>');
+            table +=('<td class="'+parity+'" style="background-color:#FFFF99" >' + data[i]['amount'] + '</td>');
             table +=('<td>' + data[i]['description'] + '</td>');
             table +=('</tr>');
           }
