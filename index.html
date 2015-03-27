@@ -35,19 +35,19 @@
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
   <style>
-    .gold {
-      background-color: #FFFF99;
-      width: 25px;
-      font-weight: bold;
-    }
-    .minus {
-      color: #CD171C;
-      font-weight: 700;
-    }
-    .plus {
-      color: #178817;
-      font-weight: 700;
-    }
+  .gold {
+    background-color: #FFFF99;
+    width: 25px;
+    font-weight: bold;
+  }
+  .minus {
+    color: #CD171C;
+    font-weight: 700;
+  }
+  .plus {
+    color: #178817;
+    font-weight: 700;
+  }
   </style>
 
 </head>
@@ -213,35 +213,7 @@
   document.querySelector('paper-tabs').selected = 0;
 
 
-var paymentProvider = 'https://klaranet.com/d/user/';
-
-
-  // Listen to WebIDAuth events
-  window.addEventListener('WebIDAuth',function(e) {
-    console.log(e.detail);
-    if (e.detail.success === true) {
-      console.log("Auth successful! WebID: "+e.detail.user);
-      localStorage.setItem('webid', e.detail.user);
-      $('webid-login').hide();
-      init(e.detail.user);
-      // presence
-    } else {
-      console.log("Auth failed!");
-      console.log(e.detail);
-    }
-  },false);
-
-
-
-
-
-
-
-
-
-
-
-
+  var paymentProvider = 'https://klaranet.com/d/user/';
 
 
 
@@ -264,6 +236,10 @@ var paymentProvider = 'https://klaranet.com/d/user/';
 
       var webid = e.detail.user;
       console.log('WebID is : ' + webid);
+
+
+      localStorage.setItem('webid', e.detail.user);
+      $('webid-login').hide();
 
 
       function update() {
@@ -412,13 +388,13 @@ var paymentProvider = 'https://klaranet.com/d/user/';
             console.log(wc);
 
             $.ajax({
-        			url: paymentProvider + hash + '/,meta',
-        			contentType: "text/turtle",
-        			type: 'PUT',
-        			data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
-        			success: function(result) {
-        			}
-        		});
+              url: paymentProvider + hash + '/,meta',
+              contentType: "text/turtle",
+              type: 'PUT',
+              data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
+              success: function(result) {
+              }
+            });
 
             setTimeout(update, 3000);
 
@@ -479,13 +455,13 @@ var paymentProvider = 'https://klaranet.com/d/user/';
 
 
             $.ajax({
-        			url: paymentProvider + hash + '/,meta',
-        			contentType: "text/turtle",
-        			type: 'PUT',
-        			data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
-        			success: function(result) {
-        			}
-        		});
+              url: paymentProvider + hash + '/,meta',
+              contentType: "text/turtle",
+              type: 'PUT',
+              data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
+              success: function(result) {
+              }
+            });
 
             setTimeout(update, 2000);
 
