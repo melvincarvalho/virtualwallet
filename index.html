@@ -409,6 +409,15 @@ var paymentProvider = 'https://klaranet.com/d/user/';
 
             console.log(wc);
 
+            $.ajax({
+        			url: paymentProvider + hash + '/,meta',
+        			contentType: "text/turtle",
+        			type: 'PUT',
+        			data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
+        			success: function(result) {
+        			}
+        		});
+
 
             setTimeout(update, 2000);
 
@@ -463,12 +472,21 @@ var paymentProvider = 'https://klaranet.com/d/user/';
             wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
             wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#mark> .\n';
 
+            putFile(paymentProvider + hash + '/1', wc);
 
-            console.log(paymentProvider + hash + '/1', wc);
+            console.log(wc);
 
+
+            $.ajax({
+        			url: paymentProvider + hash + '/,meta',
+        			contentType: "text/turtle",
+        			type: 'PUT',
+        			data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
+        			success: function(result) {
+        			}
+        		});
 
             setTimeout(update, 2000);
-            $('.nav-tabs li:eq(1) a').tab('show');
 
 
 
