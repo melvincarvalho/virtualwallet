@@ -9,6 +9,7 @@
   <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
   <!-- Vendor specific deps -->
   <script src="app/vendor/common.js"></script>
+  <script src="app/vendor/howler.min.js"></script>
   <script src="app/vendor/rdflib.js/rdflib.js"></script>
   <script src="app/vendor/sha256.js"></script>  <!-- App -->
   <script src="app/app.js"></script>
@@ -566,6 +567,16 @@
                 catch (ex) {
                 }
               };
+
+              function playSound(uri) {
+        				var sound = new Howl({
+        					urls: [uri],
+        					volume: 0.9
+        				}).play();
+        				navigator.vibrate(500);
+        			}
+
+              playSound('https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav');
 
               setTimeout(function(){
                 notification.close()
