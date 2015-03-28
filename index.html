@@ -501,7 +501,7 @@
 
 
     function render() {
-      console.log('updating');
+      console.log('rendering');
 
       // get balance
       var balanceURI = "http://klaranet.com/balance?uri=" + encodeURIComponent(webid);
@@ -518,14 +518,14 @@
       var txURI = "http://klaranet.com/tx?uri=" + encodeURIComponent(webid);
       var jqxhr = $.ajax( txURI )
       .done(function(data) {
+
         $('#txmain').hide();
 
-        var len = template.tx.length;
-        template.tx = [];
+        var found = false;
 
         var table = '';
         if(data.length>0) {
-          table += ('<table vocab="https://w3id.org/cc#" class="table table-striped table-bordered table-hover"><thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>');
+          table += ('<table vocab="https://w3id.org/cc#" class="table table-hover table-mc-light-blue""><thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>');
         }
 
         var amount;
@@ -543,7 +543,17 @@
           table +=('<td class="'+parity+'" style="background-color:#FFFF99" >' + amount + '</td>');
           table +=('<td>' + data[i]['description'] + '</td>');
           table +=('</tr>');
-          template.tx.push(data);
+          var exists = false;
+          for (var j=0; j<template.tx.length; j++) {
+            if (template.tx[j] && template.tx[j]['@id'] === data[i]['@id']) {
+              exists = true;
+              break;
+            }
+          }
+          if (!exists) {
+            template.tx.push(data);
+            found = true;
+          }
         }
 
 
@@ -551,7 +561,8 @@
           table +=('</table>');
         }
         $('#txtable').empty().append(table);
-        if (len && len < data.length) {
+
+        if (found) {
 
           if(notify){
             var notification = new Notification('Incoming Payment! (' + data[0].amount + ')',
