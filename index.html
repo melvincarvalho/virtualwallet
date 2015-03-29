@@ -108,7 +108,7 @@
       <div class="tab-pane" id="history">
 
         <div id="history">
-          <span id="txmain">You do not yet have any transaction history</span>
+          <span id="txmain">No transactions found yet</span>
           <span id="txtable"></span>
 
         </div>
@@ -217,6 +217,7 @@
   template.tx = [];
   var subs = [];
   var paymentProvider = 'https://klaranet.com/d/user/';
+  var api = 'http://klaranet.com/api/v1/';
   var webid;
 
 
@@ -506,7 +507,7 @@
       console.log('rendering');
 
       // get balance
-      var balanceURI = "http://klaranet.com/api/v1/balance?uri=" + encodeURIComponent(webid);
+      var balanceURI = api + 'balance?uri=' + encodeURIComponent(webid);
       var jqxhr = $.ajax( balanceURI )
       .done(function(data) {
         $('#loginmain').hide();
@@ -517,7 +518,7 @@
       });
 
       // get history
-      var txURI = "http://klaranet.com/tx?uri=" + encodeURIComponent(webid);
+      var txURI =  api + 'tx?uri=' + encodeURIComponent(webid);
       var jqxhr = $.ajax( txURI )
       .done(function(data) {
 
