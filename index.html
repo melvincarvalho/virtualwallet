@@ -220,8 +220,8 @@
   var webid;
 
 
-
-  var ldpc = paymentProvider + '5edbedfea2005c9feca6c014a6d8b2237d1e54c4113155621e2d7ecb7427c42b' + '/';
+  var hash = '5edbedfea2005c9feca6c014a6d8b2237d1e54c4113155621e2d7ecb7427c42b';
+  var ldpc = paymentProvider + hash + '/';
   var wss = 'wss://' + ldpc.split('/')[2];
 
 
@@ -230,7 +230,6 @@
   // init
   var init = function() {
 
-    connectToSocket(wss,  ldpc +',meta', subs);
 
 
     // Event listener for login (from child iframe)
@@ -245,6 +244,9 @@
       console.log('WebID is : ' + webid);
 
       if(!webid) return;
+      hash = CryptoJS.SHA256(webid).toString();
+      var ldpc = paymentProvider + hash + '/';
+      connectToSocket(wss,  ldpc +',meta', subs);
 
 
       localStorage.setItem('webid', e.detail.user);
@@ -504,11 +506,11 @@
       console.log('rendering');
 
       // get balance
-      var balanceURI = "http://klaranet.com/balance?uri=" + encodeURIComponent(webid);
+      var balanceURI = "http://klaranet.com/api/v1/balance?uri=" + encodeURIComponent(webid);
       var jqxhr = $.ajax( balanceURI )
       .done(function(data) {
         $('#loginmain').hide();
-        $('#amount').text('Balance: ' + data);
+        $('#amount').text('Balance: ' + data['amount'] + ' ' + data['currency']);
       })
       .fail(function() {
         console.log('could not get balance');
@@ -522,6 +524,9 @@
         $('#txmain').hide();
 
         var found = false;
+
+        console.log('num cached tx : ' + template.tx.length);
+        console.log('num recieved tx : ' + data.length);
 
         var table = '';
         if(data.length>0) {
@@ -551,7 +556,7 @@
             }
           }
           if (!exists) {
-            template.tx.push(data);
+            template.tx.push(data[i]);
             found = true;
           }
         }
