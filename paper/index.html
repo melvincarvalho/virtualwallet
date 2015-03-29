@@ -199,6 +199,31 @@ xml:lang="en" lang="en">
         </section>
 
 
+        <section id="payment" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#payment]">
+          <h3 about="[this:#payment]" property="dcterms:title">Payments</h3>
+          <div about="[this:#payment]" property="dcterms:description">
+            <p>Payments are initiated using HTTP PUT/POST.  Having found the payment area of a users payment processor (using follow your nose)
+            the there will normally be an area to create a new payment, typically a linked data platform container.  A PUT or POST to this container
+            will trigger a down stream process listening on the web socket to process the new transaction.  A typical payment may look like:</p>
+
+
+              <p><pre>{"@id":"ni:///sha-256;dTlpZmY3L1pJUEoxLy90VWkxR00xUFhZQTY5eUdJckpWY04zdXk3elJwdz0",
+                "source":"http://bitbots.org/workbot#this",
+                "amount":250,
+                "currency":"https://w3id.org/cc#mark",
+                "destination":"http://melvincarvalho.com/#me",
+                "timestamp":"2015-03-28T09:55:29.803Z",
+                "description":"work"}</pre></p>
+
+                <p>Generally the @id will be added afterward, in our implementation it's the hash of the canaonical form of the data.  Downstream processing
+                is not covered in this document, but typically the transaction will be validated, checked for access control, checked that the amount is in the
+                allowed range, moved to either an OK or error condition, which is reflected in the API.  After processing the websocket is again triggered so that
+                connected agents can update.</p>
+
+              </div>
+            </section>
+
+
         <section id="notifications" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#notifications]">
           <h3 about="[this:#notifications]" property="dcterms:title">Notifications</h3>
           <div about="[this:#notifications]" property="dcterms:description">
