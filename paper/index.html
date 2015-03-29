@@ -13,7 +13,7 @@ xml:lang="en" lang="en">
   <script src="scripts/lr.js"></script>
 </head>
 
-<body about="http://virtualwallet.org/paper/" typeof="foaf:Document sioc:Post biblio:Paper prov:Entity" class="hfeed" prefix="rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns# rdfs: http://www.w3.org/2000/01/rdf-schema# owl: http://www.w3.org/2002/07/owl# xsd: http://www.w3.org/2001/XMLSchema# dcterms: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ v: http://www.w3.org/2006/vcard/ns# pimspace: http://www.w3.org/ns/pim/space# cc: http://creativecommons.org/ns# skos: http://www.w3.org/2004/02/skos/core# prov: http://www.w3.org/ns/prov# schema: http://schema.org/ rsa: http://www.w3.org/ns/auth/rsa# cert: http://www.w3.org/ns/auth/cert# cal: http://www.w3.org/2002/12/cal/ical# wgs: http://www.w3.org/2003/01/geo/wgs84_pos# org: http://www.w3.org/ns/org# biblio: http://purl.org/net/biblio# bibo: http://purl.org/ontology/bibo/ book: http://purl.org/NET/book/vocab# ov: http://open.vocab.org/terms/ doap: http://usefulinc.com/ns/doap# dbr: http://dbpedia.org/resource/ dbp: http://dbpedia.org/property/ sio: http://semanticscience.org/resource/ opmw: http://www.opmw.org/ontology/ deo: http://purl.org/spar/deo/ doco: http://purl.org/spar/doco/ cito: http://purl.org/spar/cito/ fabio: http://purl.org/spar/fabio/ sro: http://salt.semanticauthoring.org/ontologies/sro# this: http://csarven.ca/enabling-accessible-knowledge">
+<body about="http://virtualwallet.org/paper/" typeof="foaf:Document sioc:Post biblio:Paper prov:Entity" class="hfeed" prefix="rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns# rdfs: http://www.w3.org/2000/01/rdf-schema# owl: http://www.w3.org/2002/07/owl# xsd: http://www.w3.org/2001/XMLSchema# dcterms: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ v: http://www.w3.org/2006/vcard/ns# pimspace: http://www.w3.org/ns/pim/space# cc: http://creativecommons.org/ns# skos: http://www.w3.org/2004/02/skos/core# prov: http://www.w3.org/ns/prov# schema: http://schema.org/ rsa: http://www.w3.org/ns/auth/rsa# cert: http://www.w3.org/ns/auth/cert# cal: http://www.w3.org/2002/12/cal/ical# wgs: http://www.w3.org/2003/01/geo/wgs84_pos# org: http://www.w3.org/ns/org# biblio: http://purl.org/net/biblio# bibo: http://purl.org/ontology/bibo/ book: http://purl.org/NET/book/vocab# ov: http://open.vocab.org/terms/ doap: http://usefulinc.com/ns/doap# dbr: http://dbpedia.org/resource/ dbp: http://dbpedia.org/property/ sio: http://semanticscience.org/resource/ opmw: http://www.opmw.org/ontology/ deo: http://purl.org/spar/deo/ doco: http://purl.org/spar/doco/ cito: http://purl.org/spar/cito/ fabio: http://purl.org/spar/fabio/ sro: http://salt.semanticauthoring.org/ontologies/sro# this: http://virtualwallet.org/paper/">
   <article class="hentry">
 
     <h1 class="entry-title" property="dcterms:title">Virtual Wallet</h1>
@@ -50,17 +50,6 @@ xml:lang="en" lang="en">
     </dl>
 
 
-    <dl id="document-appeared">
-      <dt>Appeared In</dt>
-      <dd>
-        <span about="[_:CeDEM2015]" typeof="bibo:Document">
-          <span>Documentation (<a rel="foaf:page" href="http://virtualwallet.org">Documentation</a>)</span>
-          <span rel="bibo:cites" resource="http://virtualwallet.org/paper/">
-            <span rel="bibo:citedBy" resource="[_:CeDEM2015]"></span>
-          </span>
-        </span>
-      </dd>
-    </dl>
 
     <dl id="document-purpose">
       <dt>Purpose</dt>
@@ -82,7 +71,6 @@ xml:lang="en" lang="en">
           <div>
             <ul rel="dcterms:subject">
               <li><a resource="http://dbpedia.org/resource/Linked_Data" href="http://en.wikipedia.org/wiki/Linked_Data">Linked Data</a></li>
-              <li><a resource="http://dbpedia.org/resource/Semantic_publishing" href="http://en.wikipedia.org/wiki/Semantic_publishing">Semantic publishing</a></li>
             </ul>
           </div>
         </section>
@@ -136,9 +124,9 @@ xml:lang="en" lang="en">
 </section>
 
 
-<section id="accessibility" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#accessibility]">
-  <h3 about="[this:#accessibility]" property="dcterms:title">Security</h3>
-  <div about="[this:#accessibility]" property="dcterms:description">
+<section id="security" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#security]">
+  <h3 about="[this:#security]" property="dcterms:title">Security</h3>
+  <div about="[this:#security]" property="dcterms:description">
     <p>Work is done on security, in particular the tools used are Web Access Control, and TLS.  More tools will be added over time.</p>
 
 </div>
@@ -158,9 +146,9 @@ xml:lang="en" lang="en">
   </div>
 
 
-  <section id="accessibility" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#accessibility]">
-    <h3 about="[this:#accessibility]" property="dcterms:title">Discovery</h3>
-    <div about="[this:#accessibility]" property="dcterms:description">
+  <section id="discovery" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#discovery]">
+    <h3 about="[this:#discovery]" property="dcterms:title">Discovery</h3>
+    <div about="[this:#discovery]" property="dcterms:description">
       <p>Discovery is the act of following a pointer or string in order to establish more information.  The primary technicque, for discovery, is
       "Follow You Nose", dereferencing the identifier, usually using HTTP and finding out more information.  As a temporary or fallback measure well known locations
       can be used, or search engines, to augment follow your nose.</p>
@@ -169,13 +157,13 @@ xml:lang="en" lang="en">
 </section>
 
 
-<section id="transactions" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#transactions]">
-  <h3 about="[this:#accessibility]" property="dcterms:title">Balances</h3>
-  <div about="[this:#accessibility]" property="dcterms:description">
+<section id="balances" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#balances]">
+  <h3 about="[this:#balances]" property="dcterms:title">Balances</h3>
+  <div about="[this:#balances]" property="dcterms:description">
     <p>In our system any URI can have a balance and operate as a wallet or bank account.  The system will integently route payments to the right place.  The system deals
     with two types of URI to begin with.  Agents and Accounts.  A person is a URI that denotes an a Person, organization or Group.  An account is a sub division, normally
     within a payment processor that is assigned to an agent.  Balances will be returned for the given URI, normally containing that URI, the amount and the currency.  Currently located at
-    /api/vi/tx the format is</p>
+    /api/v1/tx the format is</p>
 
 
       <p><pre>{"@id":"http://melvincarvalho.com/#me",
@@ -190,10 +178,10 @@ xml:lang="en" lang="en">
 
 
     <section id="transactions" about="[this:requirements]" rel="dcterms:hasPart" resource="[this:#transactions]">
-      <h3 about="[this:#accessibility]" property="dcterms:title">Transaction History</h3>
-      <div about="[this:#accessibility]" property="dcterms:description">
+      <h3 about="[this:#transactions]" property="dcterms:title">Transaction History</h3>
+      <div about="[this:#transactions]" property="dcterms:description">
         <p>Transaction History is an API that returns transactions for a given URI (account or agent) in JSON or turtle format.
-          Currently the location is : /api/vi/tx?uri= but this needs to become more scalable.  The format supported so far is JSON.</p>
+          Currently the location is : /api/v1/tx?uri= but this needs to become more scalable.  The format supported so far is JSON.</p>
 
 
           <p><pre>{"@id":"ni:///sha-256;dTlpZmY3L1pJUEoxLy90VWkxR00xUFhZQTY5eUdJckpWY04zdXk3elJwdz0",
@@ -276,7 +264,7 @@ xml:lang="en" lang="en">
             <section id="implementation" about="http://virtualwallet.org/paper/" rel="dcterms:hasPart" resource="[this:#implementation]">
               <h2 about="[this:#implementation]" property="dcterms:title">Implementation</h2>
               <div about="[this:#implementation]" property="dcterms:description" typeof="deo:Results">
-                <p>TBA</p>
+                <p>An implementation of this work is available on github as free software under the MIT license.</p>
               </div>
 
               <figure id="screenshot" about="[this:#screenshot]" typeof="doco:FigureBox" rel="dcterms:hasPart">
