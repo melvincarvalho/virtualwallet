@@ -215,10 +215,13 @@ xml:lang="en" lang="en">
                 "timestamp":"2015-03-28T09:55:29.803Z",
                 "description":"work"}</pre></p>
 
+                <p>A payment processor must be able to handle payments for any URI so we sha256 hash the URI to create a sub directory such that each user gets
+                a unique payments area.  Currently this logic is built into the client, but later it will move to the ontology or to more granular discovery.</p>
+
                 <p>Generally the @id will be added afterward, in our implementation it's the hash of the canaonical form of the data.  Downstream processing
                 is not covered in this document, but typically the transaction will be validated, checked for access control, checked that the amount is in the
-                allowed range, moved to either an OK or error condition, which is reflected in the API.  After processing the websocket is again triggered so that
-                connected agents can update.</p>
+                allowed range, moved to either an OK or error condition, which is reflected in the API.  Our implementation uses the web credits system.  After
+                processing the websocket is again triggered so that connected agents can update.</p>
 
               </div>
             </section>
