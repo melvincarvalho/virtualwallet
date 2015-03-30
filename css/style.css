@@ -42,3 +42,16 @@
     font-size: 16px;
     font-weight: 400;
   }
+  .gold {
+    background-color: #FFFF99;
+    width: 25px;
+    font-weight: bold;
+  }
+  .minus {
+    color: #CD171C;
+    font-weight: 700;
+  }
+  .plus {
+    color: #178817;
+    font-weight: 700;
+  }

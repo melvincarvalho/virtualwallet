@@ -36,22 +36,6 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
-  <style>
-  .gold {
-    background-color: #FFFF99;
-    width: 25px;
-    font-weight: bold;
-  }
-  .minus {
-    color: #CD171C;
-    font-weight: 700;
-  }
-  .plus {
-    color: #178817;
-    font-weight: 700;
-  }
-  </style>
-
 </head>
 
 <body>
@@ -66,9 +50,6 @@
 
       <paper-tabs selected="{{selected}}" flex style="max-width: 600px;">
 
-
-
-
         <paper-tab>Balance</paper-tab>
         <paper-tab>History</paper-tab>
         <paper-tab>Pay</paper-tab>
@@ -76,21 +57,14 @@
 
       </paper-tabs>
 
-
-
     </div>
-
 
   </core-toolbar>
 
   <core-pages selected="{{selected}}">
 
-
     <div class="tab-pane active" id="balance">
-
-
       <div class="tab-pane active" id="home">
-
         <form id="create" role="form">
           <div class="form-group">
             <webid-login></webid-login>
@@ -98,30 +72,19 @@
           </div>
         </form>
       </div>
-
-
     </div>
 
-
     <div class="tab-pane" label="history">
-
       <div class="tab-pane" id="history">
-
         <div id="history">
           <span id="txmain">No transactions found yet</span>
           <span id="txtable"></span>
-
         </div>
-
-
       </div>
-
     </div>
 
     <div class="tab-pane" lebel="pay">
-
       <form id="create" role="form">
-
         <div class="form-group">
           <span id="friends"></span>
         </div>
@@ -129,9 +92,7 @@
     </div>
 
     <div class="tab-pane" lebel="withdraw">
-
       <form id="create" role="form">
-
         <div class="form-group">
           <span id="withdraw"></span>
         </div>
@@ -139,21 +100,6 @@
     </div>
 
   </core-pages>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -181,12 +127,9 @@
 
   </script>
 
-
   <script>
   var selected = 0;
-
-
-
+  var notifyIcon = "images/money.png";
 
   // Globals
   var __kb;
@@ -212,11 +155,7 @@
   var f = $rdf.fetcher(g);
   var notify = false;
 
-
-
   document.querySelector('paper-tabs').selected = 0;
-
-
 
   var template = {};
   template.tx = [];
@@ -241,12 +180,8 @@
   var wss = 'wss://' + ldpc.split('/')[2];
 
 
-
-
   // init
   var init = function() {
-
-
 
     // Event listener for login (from child iframe)
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
@@ -267,7 +202,6 @@
 
       localStorage.setItem('webid', e.detail.user);
       $('webid-login').hide();
-
 
 
       render();
@@ -407,8 +341,6 @@
             wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
             wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#mark> .\n';
 
-
-
             $('#webcredit').text(wc);
             console.log(wc);
 
@@ -445,37 +377,17 @@
 
             setTimeout(render, 2000);
 
-
-
           });
-
-
-
 
 
         } else {
           alert('Please add a crypto currency address to your profile to allow withdrawls.');
         }
 
-
-
         console.log(name);
         console.log(address);
 
-
-
-
-
-
-
-
-
-
       });
-
-
-
-
 
     },false);
 
@@ -492,9 +404,6 @@
 
         socket.onopen = function(){
           console.log(this);
-          //var today = new Date().toISOString().substr(0,10);
-          //var sub = 'sub ' + getChannel(template.settings.ldpc, template.settings.type, today) +',meta';
-          //var sub = 'sub ' + getChannel(template.settings.ldpc, template.settings.type, today) +',meta';
           console.log(sub);
           this.send('sub ' + sub);
         }
@@ -587,59 +496,54 @@
 
           if(notify){
             var notification = new Notification('Incoming Payment! (' + data[0].amount + ')',
-              {'icon': "images/money.png",
-              "body" : 'With : ' + data[0].counterparty });
-              notify = false;
+            {'icon': notifyIcon,
+            "body" : 'With : ' + data[0].counterparty });
+            notify = false;
 
-              notification.onclick = function(x) {
-                try {
-                  window.focus();
-                  this.cancel();
-                }
-                catch (ex) {
-                }
-              };
+            notification.onclick = function(x) {
+              try {
+                window.focus();
+                this.cancel();
+              }
+              catch (ex) {
+              }
+            };
 
-              function playSound(uri) {
-        				var sound = new Howl({
-        					urls: [uri],
-        					volume: 0.9
-        				}).play();
-        				navigator.vibrate(500);
-        			}
-
-              playSound('https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav');
-
-              setTimeout(function(){
-                notification.close()
-              }, 10000);
-
+            function playSound(uri) {
+              var sound = new Howl({
+                urls: [uri],
+                volume: 0.9
+              }).play();
+              navigator.vibrate(500);
             }
+
+            playSound('https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav');
+
+            setTimeout(function(){
+              notification.close()
+            }, 10000);
 
           }
 
+        }
 
-
-        })
-        .fail(function() {
-          console.log('could not get tx history');
-        });
-        document.querySelector('paper-tabs').selected = 1;
-      }
-
-
-      // render form
-      $('#source').focus();
-      $('#result').attr('rows', 10);
-
-
-
-
+      })
+      .fail(function() {
+        console.log('could not get tx history');
+      });
+      document.querySelector('paper-tabs').selected = 1;
     }
 
-    $(document).ready(init);
-    </script>
+    // render form
+    $('#source').focus();
+    $('#result').attr('rows', 10);
 
 
-  </body>
-  </html>
+  }
+
+  $(document).ready(init);
+  </script>
+
+
+</body>
+</html>
