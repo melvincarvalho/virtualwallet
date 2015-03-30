@@ -102,8 +102,6 @@
   </core-pages>
 
 
-
-
   <!-- detect when window is narrow -->
   <core-media-query id="mediaQuery" query="max-width: 640px"></core-media-query>
 
@@ -117,19 +115,17 @@
   </script>
 
 
-
   <script>
-
+  // detect when screen is narrow
   document.querySelector('#mediaQuery').addEventListener('core-media-change',
   function(e) {
     document.body.classList.toggle('core-narrow', e.detail.matches);
   });
 
-  </script>
 
-  <script>
+  // init
   var selected = 0;
-  var notifyIcon = "images/money.png";
+  var notifyIcon = getParam('notifyIcon') || "images/money.png";
 
   // Globals
   var __kb;
