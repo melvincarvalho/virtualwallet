@@ -105,15 +105,6 @@
   <!-- detect when window is narrow -->
   <core-media-query id="mediaQuery" query="max-width: 640px"></core-media-query>
 
-  <script>
-  var tabs = document.querySelector('paper-tabs');
-  var pages = document.querySelector('core-pages');
-
-  tabs.addEventListener('core-select',function(){
-    pages.selected = tabs.selected;
-  });
-  </script>
-
 
   <script>
   // detect when screen is narrow
@@ -122,10 +113,21 @@
     document.body.classList.toggle('core-narrow', e.detail.matches);
   });
 
+  // keep tabs in sync
+  var tabs = document.querySelector('paper-tabs');
+  var pages = document.querySelector('core-pages');
+
+  tabs.addEventListener('core-select',function(){
+    pages.selected = tabs.selected;
+  });
+  document.querySelector('paper-tabs').selected = 0;
+
 
   // init
   var selected = 0;
-  var notifyIcon = getParam('notifyIcon') || "images/money.png";
+  var notifyIcon  = getParam('notifyIcon')  || "images/money.png";
+  var notifySound = getParam('notifySound') || 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
+  var notifyTime  = getParam('notifyTime')  || 10000;
 
   // Globals
   var __kb;
@@ -151,7 +153,6 @@
   var f = $rdf.fetcher(g);
   var notify = false;
 
-  document.querySelector('paper-tabs').selected = 0;
 
   var template = {};
   template.tx = [];
@@ -513,11 +514,11 @@
               navigator.vibrate(500);
             }
 
-            playSound('https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav');
+            playSound(notifySound);
 
             setTimeout(function(){
               notification.close()
-            }, 10000);
+            }, notifyTime);
 
           }
 
