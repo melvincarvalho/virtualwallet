@@ -185,6 +185,9 @@
   <script>
   var selected = 0;
 
+
+
+
   // Globals
   var __kb;
   var __profile;
@@ -213,11 +216,23 @@
 
   document.querySelector('paper-tabs').selected = 0;
 
+
+
   var template = {};
   template.tx = [];
   var subs = [];
-  var paymentProvider = 'https://klaranet.com/d/user/';
-  var api = 'http://klaranet.com/api/v1/';
+
+  var api = getParam('api');
+  if (!api) {
+    api = 'http://klaranet.com/api/v1/';
+  }
+
+  var paymentProvider = getParam('paymentProvider');
+  if (!paymentProvider) {
+    paymentProvider = 'https://klaranet.com/d/user/';
+  }
+
+
   var webid;
 
 
