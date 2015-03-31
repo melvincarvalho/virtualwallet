@@ -1,6 +1,6 @@
 angular.module("wallet", [])
 .controller("VirtualWallet", function($scope, $http) {
-
+  
 
   // init
   var selected = 0;
@@ -80,8 +80,6 @@ angular.module("wallet", [])
       console.log(angular.element("body").scope().$apply());
 
     } , 2000);
-
-
 
 
 
@@ -250,7 +248,6 @@ angular.module("wallet", [])
 
           });
 
-
         } else {
           alert('Please add a crypto currency address to your profile to allow withdrawls.');
         }
@@ -259,7 +256,6 @@ angular.module("wallet", [])
         console.log(address);
 
       });
-
 
     }
 
@@ -279,13 +275,6 @@ angular.module("wallet", [])
         // log error
         console.log(data);
       });
-
-
-
-
-
-
-
 
 
 
@@ -372,7 +361,6 @@ angular.module("wallet", [])
     }
 
 
-
     function connectToSocket(socket, sub, subs) {
 
       // socket
@@ -390,9 +378,7 @@ angular.module("wallet", [])
         }
 
         socket.onmessage = function(msg){
-          console.log('Incoming message : ');
-          console.log(msg);
-          var today = new Date().toISOString().substr(0,10);
+          console.log('Incoming message : ' + msg);
 
           render();
 
@@ -406,10 +392,6 @@ angular.module("wallet", [])
       }
     }
 
-
-
   });
-
-
 
 } );
