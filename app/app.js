@@ -1,30 +1,27 @@
 angular.module("wallet", [])
 .controller("VirtualWallet", function($scope, $http) {
-  
+
 
   // init
-  var selected = 0;
   var notifyIcon  = getParam('notifyIcon')  || "images/money.png";
   var notifySound = getParam('notifySound') || 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
   var notifyTime  = getParam('notifyTime')  || 10000;
 
   // Globals
-  var __kb;
-  var __profile;
   var PROXY = "https://rww.io/proxy.php?uri={uri}";
-  var AUTH_PROXY = "https://rww.io/auth-proxy?uri=";
   var TIMEOUT = 90000;
   var DEBUG = true;
+
   // Namespaces
-  var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-  var RDFS = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
-  var FOAF = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
-  var OWL = $rdf.Namespace("http://www.w3.org/2002/07/owl#");
-  var SPACE = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
-  var UI = $rdf.Namespace("http://www.w3.org/ns/ui#");
-  var DCT = $rdf.Namespace("http://purl.org/dc/terms/");
-  var CERT = $rdf.Namespace("http://www.w3.org/ns/auth/cert#");
-  var ACL = $rdf.Namespace("http://www.w3.org/ns/auth/acl#");
+  var RDF    = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+  var RDFS   = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
+  var FOAF   = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
+  var OWL    = $rdf.Namespace("http://www.w3.org/2002/07/owl#");
+  var SPACE  = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
+  var UI     = $rdf.Namespace("http://www.w3.org/ns/ui#");
+  var DCT    = $rdf.Namespace("http://purl.org/dc/terms/");
+  var CERT   = $rdf.Namespace("http://www.w3.org/ns/auth/cert#");
+  var ACL    = $rdf.Namespace("http://www.w3.org/ns/auth/acl#");
 
   $rdf.Fetcher.crossSiteProxyTemplate=PROXY;
 
@@ -32,12 +29,10 @@ angular.module("wallet", [])
   var f = $rdf.fetcher(g);
   var notify = false;
 
-
   var subs     = [];
 
   var template     = {};
   template.tx      = [];
-  template.balance = 0;
 
 
   var api = getParam('api') || 'http://klaranet.com/api/v1/';
