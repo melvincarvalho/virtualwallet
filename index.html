@@ -50,7 +50,6 @@
       <paper-tabs selected="0" flex style="max-width: 600px;">
 
         <paper-tab>Balance</paper-tab>
-        <paper-tab>History</paper-tab>
         <paper-tab>Pay</paper-tab>
         <paper-tab>Withdraw</paper-tab>
 
@@ -70,13 +69,9 @@
             <h2 ng-show=balance>{{balance}} {{currency}}</h2>
           </div>
         </form>
-      </div>
-    </div>
 
-    <div class="tab-pane" label="history">
-      <div class="tab-pane" id="history">
         <div id="history">
-          <span id="txmain">No transactions found yet</span>
+          <span id="txmain"></span>
           <table ng-show="history" vocab="https://w3id.org/cc#" class="table table-hover table-mc-light-blue">
             <thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>
             <tr ng-repeat="t in tx | orderBy: 'timestamp':true">
