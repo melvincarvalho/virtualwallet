@@ -51,7 +51,7 @@ angular.module("wallet", [])
 
 
   $scope.balance  = 0;
-  $scope.selected = 1;
+  $scope.selected = 0;
   $scope.currency = 'bits';
   $scope.tx       = [];
   $scope.history  = false;
@@ -76,113 +76,12 @@ angular.module("wallet", [])
     localStorage.setItem('webid', e.detail.user);
     render();
 
+    setTimeout(function () {
+      console.log(angular.element("body").scope().$apply());
+
+    } , 2000);
 
 
-    function render() {
-      $('webid-login').hide();
-
-
-      // get balance
-      var balanceURI = api + 'balance?uri=' + encodeURIComponent(webid);
-      $http.get(balanceURI).
-      success(function(data, status, headers, config) {
-        $scope.balance = data['amount'];
-      }).
-      error(function(data, status, headers, config) {
-        // log error
-        console.log(data);
-      });
-
-
-
-
-
-
-
-
-
-
-      // get history
-      var txURI =  api + 'tx?uri=' + encodeURIComponent(webid);
-      var jqxhr = $.ajax( txURI )
-      .done(function(data) {
-
-        $('#txmain').hide();
-
-        var found = false;
-
-        console.log('num cached tx : ' + template.tx.length);
-        console.log('num recieved tx : ' + data.length);
-
-        var amount;
-        for( var i=0; i<data.length; i++) {
-          data[i].counterparty = data[i]['source'];
-          data[i].parity = 'plus';
-          if (data[i].counterparty === webid) {
-            data[i].counterparty = data[i]['destination'];
-            data[i].parity = 'minus';
-          }
-          amount = data[i]['amount'];
-
-          var exists = false;
-          for (var j=0; j<template.tx.length; j++) {
-            if (template.tx[j] && template.tx[j]['@id'] === data[i]['@id']) {
-              exists = true;
-              break;
-            }
-          }
-          if (!exists) {
-            template.tx.push(data[i]);
-            $scope.tx.unshift(data[i]);
-            $scope.history = true;
-            found = true;
-          }
-        }
-
-
-        if (found) {
-
-          if(notify){
-            var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
-            {'icon': notifyIcon,
-            "body" : 'With : ' + data[0].counterparty });
-            notify = false;
-
-            notification.onclick = function(x) {
-              try {
-                window.focus();
-                this.cancel();
-              }
-              catch (ex) {
-              }
-            };
-
-            function playSound(uri) {
-              var sound = new Howl({
-                urls: [uri],
-                volume: 0.9
-              }).play();
-              navigator.vibrate(500);
-            }
-
-            playSound(notifySound);
-
-            setTimeout(function(){
-              notification.close()
-            }, notifyTime);
-
-          }
-
-        }
-
-      })
-      .fail(function() {
-        console.log('could not get tx history');
-      });
-      document.querySelector('paper-tabs').selected = 1;
-
-      renderpay();
-    }
 
 
 
@@ -364,6 +263,112 @@ angular.module("wallet", [])
 
     }
 
+
+
+    function render() {
+      $('webid-login').hide();
+
+
+      // get balance
+      var balanceURI = api + 'balance?uri=' + encodeURIComponent(webid);
+      $http.get(balanceURI).
+      success(function(data, status, headers, config) {
+        $scope.balance = data['amount'];
+      }).
+      error(function(data, status, headers, config) {
+        // log error
+        console.log(data);
+      });
+
+
+
+
+
+
+
+
+
+
+      // get history
+      var txURI =  api + 'tx?uri=' + encodeURIComponent(webid);
+      var jqxhr = $.ajax( txURI )
+      .done(function(data) {
+
+        $('#txmain').hide();
+
+        var found = false;
+
+        console.log('num cached tx : ' + template.tx.length);
+        console.log('num recieved tx : ' + data.length);
+
+        var amount;
+        for( var i=0; i<data.length; i++) {
+          data[i].counterparty = data[i]['source'];
+          data[i].parity = 'plus';
+          if (data[i].counterparty === webid) {
+            data[i].counterparty = data[i]['destination'];
+            data[i].parity = 'minus';
+          }
+          amount = data[i]['amount'];
+
+          var exists = false;
+          for (var j=0; j<template.tx.length; j++) {
+            if (template.tx[j] && template.tx[j]['@id'] === data[i]['@id']) {
+              exists = true;
+              break;
+            }
+          }
+          if (!exists) {
+            template.tx.push(data[i]);
+            $scope.tx.unshift(data[i]);
+            found = true;
+          }
+        }
+
+
+        if (found) {
+
+          if(notify){
+            var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
+            {'icon': notifyIcon,
+            "body" : 'With : ' + data[0].counterparty });
+            notify = false;
+
+            notification.onclick = function(x) {
+              try {
+                window.focus();
+                this.cancel();
+              }
+              catch (ex) {
+              }
+            };
+
+            function playSound(uri) {
+              var sound = new Howl({
+                urls: [uri],
+                volume: 0.9
+              }).play();
+              navigator.vibrate(500);
+            }
+
+            playSound(notifySound);
+
+            setTimeout(function(){
+              notification.close()
+            }, notifyTime);
+
+          }
+
+        }
+
+      })
+      .fail(function() {
+        console.log('could not get tx history');
+      });
+      document.querySelector('paper-tabs').selected = 0;
+
+      renderpay();
+    }
 
 
 
