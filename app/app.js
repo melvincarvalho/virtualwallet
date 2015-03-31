@@ -322,6 +322,7 @@ angular.module("wallet", [])
             template.tx.push(data[i]);
             $scope.tx.unshift(data[i]);
             found = true;
+            $scope.$apply();
           }
         }
 
