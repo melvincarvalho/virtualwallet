@@ -54,6 +54,7 @@ angular.module("wallet", [])
   $scope.selected = 1;
   $scope.currency = 'bits';
   $scope.tx       = [];
+  $scope.history  = false;
 
 
   // Event listener for login (from child iframe)
@@ -133,6 +134,7 @@ angular.module("wallet", [])
           if (!exists) {
             template.tx.push(data[i]);
             $scope.tx.unshift(data[i]);
+            $scope.history = true;
             found = true;
           }
         }

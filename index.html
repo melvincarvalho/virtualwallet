@@ -77,7 +77,7 @@
       <div class="tab-pane" id="history">
         <div id="history">
           <span id="txmain">No transactions found yet</span>
-          <table ng-show="tx.length" vocab="https://w3id.org/cc#" class="table table-hover table-mc-light-blue">
+          <table ng-show="history" vocab="https://w3id.org/cc#" class="table table-hover table-mc-light-blue">
             <thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>
             <tr ng-repeat="t in tx | orderBy: 'timestamp':true">
               <td><time class="timestamp" is="relative-time" datetime="{{t.timestamp}}"></time></td>
