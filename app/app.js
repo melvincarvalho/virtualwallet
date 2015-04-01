@@ -36,7 +36,6 @@ angular.module("wallet", [])
   var template     = {};
   template.tx      = [];
 
-
   var api = getParam('api') || 'http://klaranet.com/api/v1/';
   var paymentProvider = getParam('paymentProvider') || 'https://klaranet.com/d/user/';
 
@@ -65,14 +64,11 @@ angular.module("wallet", [])
     localStorage.setItem('webid', e.detail.user);
     render();
 
-
   });
-
 
 
   function render() {
     $('webid-login').hide();
-
 
     // get balance
     var balanceURI = api + 'balance?uri=' + encodeURIComponent(webid);
@@ -84,8 +80,6 @@ angular.module("wallet", [])
       // log error
       console.log(data);
     });
-
-
 
     // get history
     var txURI =  api + 'tx?uri=' + encodeURIComponent(webid);
@@ -166,6 +160,7 @@ angular.module("wallet", [])
     });
     document.querySelector('paper-tabs').selected = 0;
 
+    $scope.$apply();
     renderpay();
   }
 
@@ -230,10 +225,7 @@ angular.module("wallet", [])
             xhr.send(data);
           }
 
-
           putFile(paymentProvider + hash + '/2', wc);
-
-
           console.log(wc);
 
           $.ajax({
@@ -258,9 +250,6 @@ angular.module("wallet", [])
         $('#withdraw').append('<div class="form-group"><input type="text" id="withdrawamount" placeholder="amount" class="form-control"></div>');
         $('#withdraw').append('<button id="withdrawbutton" type="button" class="btn btn-default">Withdraw</button>');
 
-
-
-
         $( "#withdrawbutton" ).click(function( event ) {
           var source = $('#source').val();
           var destination = $('#destination').val();
@@ -279,16 +268,7 @@ angular.module("wallet", [])
           }
 
           console.log(amount);
-
-          var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
-          wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
-          wc += '  <https://w3id.org/cc#destination> \n    <' + address + '> ;\n';
-          wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
-          wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
-
-          $('#webcredit').text(wc);
           console.log(wc);
-
 
           var hash = CryptoJS.SHA256(webid).toString();
 
@@ -307,8 +287,6 @@ angular.module("wallet", [])
           wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
 
           putFile(paymentProvider + hash + '/1', wc);
-
-          console.log(wc);
 
 
           $.ajax({
@@ -333,6 +311,7 @@ angular.module("wallet", [])
 
     });
 
+    $scope.$apply();
   }
 
 
