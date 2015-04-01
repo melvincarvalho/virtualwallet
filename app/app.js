@@ -40,10 +40,7 @@ angular.module("wallet", [])
 
   var webid;
 
-  var hash = '5edbedfea2005c9feca6c014a6d8b2237d1e54c4113155621e2d7ecb7427c42b';
-  var ldpc = paymentProvider + hash + '/';
-  var wss = 'wss://' + ldpc.split('/')[2];
-
+  var wss = 'wss://' + paymentProvider.split('/')[2];
 
   $scope.balance  = 0;
   $scope.selected = 0;
@@ -52,13 +49,7 @@ angular.module("wallet", [])
   $scope.history  = false;
 
 
-  // Event listener for login (from child iframe)
-  var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-  var eventListener = window[eventMethod];
-  var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
-
-  // Listen to message from child window
-  eventListener('WebIDAuth',function(e) {
+  window.addEventListener('WebIDAuth',function(e) {
 
     webid = e.detail.user;
     console.log('WebID is : ' + webid);
@@ -389,4 +380,4 @@ angular.module("wallet", [])
 
   });
 
-} );
+});
