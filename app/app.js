@@ -33,8 +33,6 @@ angular.module("wallet", [])
   var notify = false;
 
   var subs         = [];
-  var template     = {};
-  template.tx      = [];
 
   var api = getParam('api') || 'http://klaranet.com/api/v1/';
   var paymentProvider = getParam('paymentProvider') || 'https://klaranet.com/d/user/';
@@ -86,11 +84,9 @@ angular.module("wallet", [])
     var jqxhr = $.ajax( txURI )
     .done(function(data) {
 
-      $('#txmain').hide();
-
       var found = false;
 
-      console.log('num cached tx : ' + template.tx.length);
+      console.log('num cached tx : ' + $scope.tx.length);
       console.log('num recieved tx : ' + data.length);
 
       var amount;
@@ -104,14 +100,13 @@ angular.module("wallet", [])
         amount = data[i]['amount'];
 
         var exists = false;
-        for (var j=0; j<template.tx.length; j++) {
-          if (template.tx[j] && template.tx[j]['@id'] === data[i]['@id']) {
+        for (var j=0; j<$scope.tx.length; j++) {
+          if ($scope.tx[j] && $scope.tx[j]['@id'] === data[i]['@id']) {
             exists = true;
             break;
           }
         }
         if (!exists) {
-          template.tx.push(data[i]);
           $scope.tx.unshift(data[i]);
           found = true;
           $scope.$apply();
