@@ -77,7 +77,7 @@
               <thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>
               <tr ng-repeat="t in tx | orderBy: 'timestamp':true">
                 <td><time class="timestamp" is="relative-time" datetime="{{t.timestamp}}"></time></td>
-                <td>{{t.name || t.counterparty}}</td>
+                <td>{{t.name || t.counterparty | limitTo : 25 }}</td>
                 <td class="{{t.parity}}" style="background-color:#FFFF99" >{{t.amount}}</td>
                 <td>{{t.description}}</td>
               </tr>
