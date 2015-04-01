@@ -89,7 +89,16 @@
     <div class="tab-pane" lebel="pay">
       <form id="create" role="form">
         <div class="form-group">
-          <span id="friends"></span>
+          <span ng-show="friends.length" id="friends"></span>
+          <h3>Friends</h3>
+          <hr>
+          <select id="friendselect"
+              ng-model="friend" ng-options="friend as friend.label for friend in friends">
+          </select>
+          <hr>
+          <div class="form-group"><input type="text" id="sendamount" size="80" placeholder="amount" class="form-control"></div>
+          <hr>
+          <button id="sendbutton" type="button" class="btn btn-default">Send</button>
         </div>
       </form>
     </div>
