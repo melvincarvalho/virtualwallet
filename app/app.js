@@ -24,7 +24,6 @@ var f = $rdf.fetcher(g);
 angular.module("wallet", [])
 .controller("VirtualWallet", function($scope, $http) {
 
-
   // init
   var notifyIcon  = getParam('notifyIcon')  || "images/money.png";
   var notifySound = getParam('notifySound') || 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
@@ -65,6 +64,18 @@ angular.module("wallet", [])
   });
 
 
+  function updateNames() {
+    console.log('updating names');
+    for (var i=0; i<$scope.tx.length; i++) {
+      var name = g.any( $rdf.sym($scope.tx[i].counterparty), FOAF('name') );
+      if (name) {
+        $scope.tx[i].name = name.value;
+        console.log($scope.tx[i].name);
+      }
+    }
+    $scope.$apply();
+  }
+
   function render() {
     $('webid-login').hide();
 
@@ -96,6 +107,11 @@ angular.module("wallet", [])
         if (data[i].counterparty === webid) {
           data[i].counterparty = data[i]['destination'];
           data[i].parity = 'minus';
+          if (data[i].counterparty) {
+            f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
+               updateNames();
+            });
+          }
         }
         amount = data[i]['amount'];
 
@@ -165,7 +181,7 @@ angular.module("wallet", [])
     // fetch user data
     f.nowOrWhenFetched(webid.split('#')[0],undefined,function(ok, body){
 
-      var person = g.statementsMatching(undefined, RDF('type'), FOAF('Person'))[0];
+      var person = g.statementsMatching($rdf.sym(webid), RDF('type'), FOAF('Person'))[0];
 
       console.log(person);
 
@@ -174,12 +190,17 @@ angular.module("wallet", [])
       var name = g.any(subject, FOAF('name'));
       var address = g.any(subject, CURR('bitmark')) || g.any(subject, CURR('bitcoin'));
 
-      var knows = g.statementsMatching(undefined, FOAF('knows'), undefined);
+      var knows = g.statementsMatching($rdf.sym(webid), FOAF('knows'), undefined);
       if ( knows.length > 0 ) {
         for (var i=0; i<knows.length; i++) {
           var know = knows[i];
           console.log(know.object.value);
           $scope.friends.push({id: know.object.value, label: know.object.value});
+          if (know.object.value) {
+            f.nowOrWhenFetched(know.object.value.split('#')[0],undefined, function(ok, body) {
+               updateNames();
+            });
+          }
         }
         $scope.friend = $scope.friends[0];
         console.log($scope.friends);
@@ -298,7 +319,7 @@ angular.module("wallet", [])
         });
 
       } else {
-        alert('Please add a crypto currency address to your profile to allow withdrawls.');
+        console.log('Please add a crypto currency address to your profile to allow withdrawls.');
       }
 
       console.log(name);
