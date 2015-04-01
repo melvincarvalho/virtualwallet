@@ -72,94 +72,95 @@
 
         <div id="history">
           <span id="txmain"></span>
-          <table ng-show="tx.length" vocab="https://w3id.org/cc#" class="table table-hover table-mc-light-blue">
-            <thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>
-            <tr ng-repeat="t in tx | orderBy: 'timestamp':true">
-              <td><time class="timestamp" is="relative-time" datetime="{{t.timestamp}}"></time></td>
-              <td>{{t.name || t.counterparty}}</td>
-              <td class="{{t.parity}}" style="background-color:#FFFF99" >{{t.amount}}</td>
-              <td>{{t.description}}</td>
-            </tr>
-          </table>
-          <span id="txtable"></span>
+          <small>
+            <table ng-show="tx.length" vocab="https://w3id.org/cc#" class="table table-hover table-mc-light-blue">
+              <thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>
+              <tr ng-repeat="t in tx | orderBy: 'timestamp':true">
+                <td><time class="timestamp" is="relative-time" datetime="{{t.timestamp}}"></time></td>
+                <td>{{t.name || t.counterparty}}</td>
+                <td class="{{t.parity}}" style="background-color:#FFFF99" >{{t.amount}}</td>
+                <td>{{t.description}}</td>
+              </tr>
+            </table>
+          </small>
         </div>
       </div>
     </div>
 
     <div class="tab-pane" lebel="pay">
       <form id="create" role="form">
-        <div class="form-group">
-          <span ng-show="friends.length" id="friends"></span>
+        <div ng-show="friends.length" class="form-group">
+          <span id="friends"></span>
           <h3>Friends</h3>
           <hr>
           <select id="friendselect"
-              ng-model="friend" ng-options="friend as friend.label for friend in friends">
-          </select>
-          <hr>
-          <div class="form-group"><input type="text" id="sendamount" size="80" placeholder="amount" class="form-control"></div>
-          <hr>
-          <button id="sendbutton" type="button" class="btn btn-default">Send</button>
-        </div>
-      </form>
-    </div>
+          ng-model="friend" ng-options="friend as friend.label for friend in friends">
+        </select>
+        <hr>
+        <div class="form-group"><input type="text" id="sendamount" size="80" placeholder="amount" class="form-control"></div>
+        <hr>
+        <button id="sendbutton" type="button" class="btn btn-default">Send</button>
+      </div>
+    </form>
+  </div>
 
-    <div class="tab-pane" lebel="withdraw">
-      <form id="create" role="form">
-        <div class="form-group">
-          <span id="withdraw"></span>
-        </div>
-      </form>
-    </div>
+  <div class="tab-pane" lebel="withdraw">
+    <form id="create" role="form">
+      <div class="form-group">
+        <span id="withdraw"></span>
+      </div>
+    </form>
+  </div>
 
-  </core-pages>
-
-
-  <!-- detect when window is narrow -->
-  <core-media-query id="mediaQuery" query="max-width: 640px"></core-media-query>
+</core-pages>
 
 
-  <script>
-  // detect when screen is narrow
-  document.querySelector('#mediaQuery').addEventListener('core-media-change',
-  function(e) {
-    document.body.classList.toggle('core-narrow', e.detail.matches);
-  });
-
-  // keep tabs in sync
-  var tabs = document.querySelector('paper-tabs');
-  var pages = document.querySelector('core-pages');
-
-  tabs.addEventListener('core-select',function(){
-    pages.selected = tabs.selected;
-  });
-  document.querySelector('paper-tabs').selected = 0;
+<!-- detect when window is narrow -->
+<core-media-query id="mediaQuery" query="max-width: 640px"></core-media-query>
 
 
-  // Event listener for login (from child iframe)
-  var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-  var eventListener = window[eventMethod];
-  var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+<script>
+// detect when screen is narrow
+document.querySelector('#mediaQuery').addEventListener('core-media-change',
+function(e) {
+  document.body.classList.toggle('core-narrow', e.detail.matches);
+});
 
-  // Listen to message from child window
-  eventListener('WebIDAuth',function(e) {
+// keep tabs in sync
+var tabs = document.querySelector('paper-tabs');
+var pages = document.querySelector('core-pages');
 
-    webid = e.detail.user;
-    console.log('WebID is : ' + webid);
-
-    if(!webid) return;
-    hash = CryptoJS.SHA256(webid).toString();
-
+tabs.addEventListener('core-select',function(){
+  pages.selected = tabs.selected;
+});
+document.querySelector('paper-tabs').selected = 0;
 
 
-    setTimeout(function () {
-      console.log('refresh');
-      angular.element("body").scope().$apply();
+// Event listener for login (from child iframe)
+var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+var eventListener = window[eventMethod];
+var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
 
-    } , 3000);
+// Listen to message from child window
+eventListener('WebIDAuth',function(e) {
 
-  });
+  webid = e.detail.user;
+  console.log('WebID is : ' + webid);
 
-  </script>
+  if(!webid) return;
+  hash = CryptoJS.SHA256(webid).toString();
+
+
+
+  setTimeout(function () {
+    console.log('refresh');
+    angular.element("body").scope().$apply();
+
+  } , 3000);
+
+});
+
+</script>
 
 
 </body>

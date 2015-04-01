@@ -70,7 +70,7 @@ angular.module("wallet", [])
       var name = g.any( $rdf.sym($scope.tx[i].counterparty), FOAF('name') );
       if (name) {
         $scope.tx[i].name = name.value;
-        console.log($scope.tx[i].name);
+        //console.log($scope.tx[i].name);
       }
     }
     $scope.$apply();
@@ -107,11 +107,12 @@ angular.module("wallet", [])
         if (data[i].counterparty === webid) {
           data[i].counterparty = data[i]['destination'];
           data[i].parity = 'minus';
-          if (data[i].counterparty) {
-            f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
-               updateNames();
-            });
-          }
+        }
+        if (data[i].counterparty) {
+          console.log('Fetching ' + data[i].counterparty.split('#')[0])
+          f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
+             updateNames();
+          });
         }
         amount = data[i]['amount'];
 
