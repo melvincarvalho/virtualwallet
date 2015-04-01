@@ -32,8 +32,7 @@ angular.module("wallet", [])
 
   var notify = false;
 
-  var subs     = [];
-
+  var subs         = [];
   var template     = {};
   template.tx      = [];
 
@@ -187,32 +186,18 @@ angular.module("wallet", [])
 
       var knows = g.statementsMatching(undefined, FOAF('knows'), undefined);
       if ( knows.length > 0 ) {
-        var sel = $('<select id="friendsselect">');
-        sel.append($("<option>").attr('value','Friends').text('Friends'));
         for (var i=0; i<knows.length; i++) {
           var know = knows[i];
           console.log(know.object.value);
-          sel.append($("<option>").attr('value',know.object.value).text(know.object.value));
+          $scope.friends.push({id: know.object.value, label: know.object.value});
         }
-        $('#friends').empty().append(sel);
-
-        $('#friends').append('<div class="form-group"><input type="text" id="sendamount" size="80" placeholder="send" class="form-control"></div>');
-        $('#friends').append('<button id="sendbutton" type="button" class="btn btn-default">Send</button>');
-      }
-
-      if (address) {
-        address = address.value;
-
-        $('#withdraw').empty().append('<hr><br>');
-        $('#withdraw').text('Address: ' + address);
-
-        $('#withdraw').append('<div class="form-group"><input type="text" id="withdrawamount" placeholder="amount" class="form-control"></div>');
-        $('#withdraw').append('<button id="withdrawbutton" type="button" class="btn btn-default">Withdraw</button>');
-
+        $scope.friend = $scope.friends[0];
+        console.log($scope.friends);
 
         $( "#sendbutton" ).click(function( event ) {
           var source = $('#source').val();
           var destination = $('#friendsselect').val();
+          destination = $scope.friend.id;
           var amount = $('#sendamount').val();
 
           var err = '';
@@ -234,10 +219,6 @@ angular.module("wallet", [])
           wc += '  <https://w3id.org/cc#destination> \n    <' + destination + '> ;\n';
           wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
           wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
-
-
-
-          $('#webcredit').text(wc);
 
 
           var hash = CryptoJS.SHA256(webid).toString();
@@ -264,10 +245,20 @@ angular.module("wallet", [])
             }
           });
 
-          setTimeout(render, 3000);
-
-
         });
+
+      }
+
+      if (address) {
+        address = address.value;
+
+        $('#withdraw').empty().append('<hr><br>');
+        $('#withdraw').text('Address: ' + address);
+
+        $('#withdraw').append('<div class="form-group"><input type="text" id="withdrawamount" placeholder="amount" class="form-control"></div>');
+        $('#withdraw').append('<button id="withdrawbutton" type="button" class="btn btn-default">Withdraw</button>');
+
+
 
 
         $( "#withdrawbutton" ).click(function( event ) {
