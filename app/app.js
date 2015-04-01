@@ -48,20 +48,32 @@ angular.module("wallet", [])
   $scope.friends  = [];
 
 
-  window.addEventListener('WebIDAuth',function(e) {
 
-    webid = e.detail.user;
-    console.log('WebID is : ' + webid);
+  if (localStorage.getItem('webid')) {
 
-    if(!webid) return;
+    webid = localStorage.getItem('webid')
     hash = CryptoJS.SHA256(webid).toString();
     var ldpc = paymentProvider + hash + '/';
     connectToSocket(wss,  ldpc +',meta', subs);
-
-    localStorage.setItem('webid', e.detail.user);
     render();
 
-  });
+  } else {
+    window.addEventListener('WebIDAuth',function(e) {
+
+      webid = e.detail.user;
+      console.log('WebID is : ' + webid);
+
+      if(!webid) return;
+      hash = CryptoJS.SHA256(webid).toString();
+      var ldpc = paymentProvider + hash + '/';
+      connectToSocket(wss,  ldpc +',meta', subs);
+
+      localStorage.setItem('webid', e.detail.user);
+      render();
+
+    });
+  }
+
 
 
   function updateNames() {
