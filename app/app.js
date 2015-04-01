@@ -1,3 +1,26 @@
+// Globals
+var PROXY = "https://rww.io/proxy.php?uri={uri}";
+var TIMEOUT = 90000;
+var DEBUG = true;
+
+// Namespaces
+var ACL    = $rdf.Namespace("http://www.w3.org/ns/auth/acl#");
+var CURR   = $rdf.Namespace("https://w3id.org/cc#");
+var CERT   = $rdf.Namespace("http://www.w3.org/ns/auth/cert#");
+var DCT    = $rdf.Namespace("http://purl.org/dc/terms/");
+var FOAF   = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
+var OWL    = $rdf.Namespace("http://www.w3.org/2002/07/owl#");
+var RDF    = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+var RDFS   = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
+var SPACE  = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
+var UI     = $rdf.Namespace("http://www.w3.org/ns/ui#");
+
+$rdf.Fetcher.crossSiteProxyTemplate=PROXY;
+
+var g = $rdf.graph();
+var f = $rdf.fetcher(g);
+
+
 angular.module("wallet", [])
 .controller("VirtualWallet", function($scope, $http) {
 
@@ -7,26 +30,6 @@ angular.module("wallet", [])
   var notifySound = getParam('notifySound') || 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
   var notifyTime  = getParam('notifyTime')  || 10000;
 
-  // Globals
-  var PROXY = "https://rww.io/proxy.php?uri={uri}";
-  var TIMEOUT = 90000;
-  var DEBUG = true;
-
-  // Namespaces
-  var RDF    = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-  var RDFS   = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
-  var FOAF   = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
-  var OWL    = $rdf.Namespace("http://www.w3.org/2002/07/owl#");
-  var SPACE  = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
-  var UI     = $rdf.Namespace("http://www.w3.org/ns/ui#");
-  var DCT    = $rdf.Namespace("http://purl.org/dc/terms/");
-  var CERT   = $rdf.Namespace("http://www.w3.org/ns/auth/cert#");
-  var ACL    = $rdf.Namespace("http://www.w3.org/ns/auth/acl#");
-
-  $rdf.Fetcher.crossSiteProxyTemplate=PROXY;
-
-  var g = $rdf.graph();
-  var f = $rdf.fetcher(g);
   var notify = false;
 
   var subs     = [];
@@ -47,6 +50,7 @@ angular.module("wallet", [])
   $scope.currency = 'bits';
   $scope.tx       = [];
   $scope.history  = false;
+  $scope.friends  = [];
 
 
   window.addEventListener('WebIDAuth',function(e) {
@@ -171,9 +175,6 @@ angular.module("wallet", [])
 
     // fetch user data
     f.nowOrWhenFetched(webid.split('#')[0],undefined,function(ok, body){
-      var FOAF = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
-      var CURR = $rdf.Namespace("https://w3id.org/cc#");
-      var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 
       var person = g.statementsMatching(undefined, RDF('type'), FOAF('Person'))[0];
 
@@ -374,8 +375,5 @@ angular.module("wallet", [])
       }
     }
   }
-
-
-
 
 });
