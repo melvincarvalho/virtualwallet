@@ -137,6 +137,13 @@ angular.module("wallet", [])
         //console.log($scope.tx[i].name);
       }
     }
+    for (var i=0; i<$scope.friends.length; i++) {
+      var name = g.any( $rdf.sym($scope.friends[i].id), FOAF('name') );
+      if (name) {
+        $scope.friends[i].name = name.value;
+        //console.log($scope.tx[i].name);
+      }
+    }
     $scope.$apply();
   }
 

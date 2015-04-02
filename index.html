@@ -94,7 +94,7 @@
           <h3>Friends</h3>
           <hr>
           <select id="friendselect"
-          ng-model="friend" ng-options="friend as friend.label for friend in friends">
+          ng-model="friend" ng-options="friend as friend.name || friend.label for friend in friends track by friend.label">
         </select>
         <hr>
         <div class="form-group"><input type="text" id="sendamount" size="80" placeholder="amount" class="form-control"></div>
