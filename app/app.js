@@ -76,6 +76,58 @@ angular.module("wallet", [])
 
 
 
+  $( "#sendbutton" ).click(function( event ) {
+    var source = $('#source').val();
+    var destination = $('#friendsselect').val();
+    destination = $scope.friend.id;
+    var amount = $('#sendamount').val();
+
+    var err = '';
+
+    if(!amount) err +=('Please enter an amount\n');
+
+    if (isNaN(amount)) err += ('Amount must be a number');
+    amount = parseFloat(amount);
+
+    if(err !== '') {
+      alert(err);
+      return false;
+    }
+
+    console.log(amount);
+
+    var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
+    wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
+    wc += '  <https://w3id.org/cc#destination> \n    <' + destination + '> ;\n';
+    wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
+    wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
+
+
+    var hash = CryptoJS.SHA256(webid).toString();
+
+    function putFile(file, data) {
+      xhr = new XMLHttpRequest();
+      xhr.open('PUT', file, false);
+      xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
+      xhr.send(data);
+    }
+
+    putFile(paymentProvider + hash + '/2', wc);
+    console.log(wc);
+
+    $.ajax({
+      url: paymentProvider + hash + '/,meta',
+      contentType: "text/turtle",
+      type: 'PUT',
+      data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
+      success: function(result) {
+      }
+    });
+
+  });
+
+
+
   function updateNames() {
     console.log('updating names');
     for (var i=0; i<$scope.tx.length; i++) {
@@ -218,55 +270,6 @@ angular.module("wallet", [])
         $scope.friend = $scope.friends[0];
         console.log($scope.friends);
 
-        $( "#sendbutton" ).click(function( event ) {
-          var source = $('#source').val();
-          var destination = $('#friendsselect').val();
-          destination = $scope.friend.id;
-          var amount = $('#sendamount').val();
-
-          var err = '';
-
-          if(!amount) err +=('Please enter an amount\n');
-
-          if (isNaN(amount)) err += ('Amount must be a number');
-          amount = parseFloat(amount);
-
-          if(err !== '') {
-            alert(err);
-            return false;
-          }
-
-          console.log(amount);
-
-          var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
-          wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
-          wc += '  <https://w3id.org/cc#destination> \n    <' + destination + '> ;\n';
-          wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
-          wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
-
-
-          var hash = CryptoJS.SHA256(webid).toString();
-
-          function putFile(file, data) {
-            xhr = new XMLHttpRequest();
-            xhr.open('PUT', file, false);
-            xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
-            xhr.send(data);
-          }
-
-          putFile(paymentProvider + hash + '/2', wc);
-          console.log(wc);
-
-          $.ajax({
-            url: paymentProvider + hash + '/,meta',
-            contentType: "text/turtle",
-            type: 'PUT',
-            data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
-            success: function(result) {
-            }
-          });
-
-        });
 
       }
 
