@@ -73,7 +73,7 @@
         <div id="history">
           <span id="txmain"></span>
           <small>
-            <table ng-show="tx.length" vocab="https://w3id.org/cc#" class="table table-hover table-mc-light-blue">
+            <table ng-show="tx.length" vocab="https://w3id.org/cc#" style="width: auto" class="striped hoverable table responsive-table table-hover table-mc-light-blue">
               <thead><tr><th>When</th><th>Source</th><th class="gold">Amount</th><th>Why</th></tr></thead>
               <tr ng-repeat="t in tx | orderBy: 'timestamp':true">
                 <td><time class="timestamp" is="relative-time" datetime="{{t.timestamp}}"></time></td>
