@@ -47,7 +47,7 @@ xml:lang="en" lang="en">
     <dl id="document-license">
       <dt>License</dt>
       <dd><a about="http://webid.im/paper/" rel="license cc:license" href="http://creativecommons.org/licenses/by-sa/4.0/" title="Creative Commons Attribution-ShareAlike 4.0 Unported">CC BY-SA 4.0</a></dd>
-    </dl>    
+    </dl>
 
 
     <dl id="document-purpose">
@@ -253,28 +253,21 @@ xml:lang="en" lang="en">
                                       <section id="components" about="http://virtualwallet.org/paper/" rel="dcterms:hasPart" resource="[this:#components]">
                                         <h2 about="[this:#components]" property="dcterms:title">Components</h2>
                                         <div about="[this:#components]" property="dcterms:description">
-                                          <p>As far as possible this project aims to reuse web standards and work done by the W3C.  The main items followed are W3C Design Issues, WebID, Linked Data, Linked Data Platform,
+                                          <p>As far as possible this project aims to reuse web standards and work done by the W3C.  The main items followed are <cite><a href="https://linkeddata.github.io/SoLiD/">SoLiD</a></cite>, W3C Design Issues, WebID, Linked Data, Linked Data Platform,
                                             HTML5, RESTful principles and Websockets</p>
 
-                                            <section id="WebID" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#WebID]">
-                                              <h3 about="[this:#WebID]" property="dcterms:title">WebID</h3>
-                                              <div about="[this:#WebID]" property="dcterms:description">
-                                                <p>WebID will be used for Identity.  A WebID is an HTTP URI that denotes an Agent.  Hash URIs are preferred.  The system can later be exteneded to include any URI such as email,
-                                                  hashes, tel: and devices.</p>
-                                                </div>
-                                              </section>
-
-                                              <section id="LDP" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#LDP]">
-                                                <h3 about="[this:#LDP]" property="dcterms:title">LDP</h3>
-                                                <div about="[this:#LDP]" property="dcterms:description">
-                                                  <p>Linked Data Principles will be used throughout this work, and Linked Data Platform as a commodity back end.</p>
+                                              <section id="solid" about="[this:#solid]" rel="dcterms:hasPart" resource="[this:#solid]">
+                                                <h3 about="[this:#solid]" property="dcterms:title">SoLiD</h3>
+                                                <div about="[this:#solid]" property="dcterms:description">
+                                                  <p><cite><a href="https://linkeddata.github.io/SoLiD/">SoLiD</a></cite> is the social linked data platform.  SoLiD was designed from the ground up to be modular and openly extensible. It relies as much as possible on existing W3C standards.
+                                                    RDF, LDP, Websockets, WebID, WebID-TLS, WebID-RSA, WebAccessControl</p>
                                                 </div>
                                               </section>
 
                                               <section id="webcredits" about="[this:#challenges]" rel="dcterms:hasPart" resource="[this:#webcredits]">
                                                 <h3 about="[this:#webcredits]" property="dcterms:title">Web Credits</h3>
                                                 <div about="[this:#webcredits]" property="dcterms:description">
-                                                  <p>The web credits ontology will be used as a simple way to track credits between URIs.</p>
+                                                  <p>The webcredits ontology will be used as a simple way to track credits between URIs.</p>
                                                 </div>
                                               </section>
 
