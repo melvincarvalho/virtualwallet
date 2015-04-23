@@ -51,7 +51,7 @@ angular.module("wallet", [])
 
   if (localStorage.getItem('webid')) {
 
-    webid = localStorage.getItem('webid')
+    webid = localStorage.getItem('webid');
     hash = CryptoJS.SHA256(webid).toString();
     var ldpc = paymentProvider + hash + '/';
     connectToSocket(wss,  ldpc +',meta', subs);
@@ -180,7 +180,7 @@ angular.module("wallet", [])
           data[i].parity = 'minus';
         }
         if (data[i].counterparty) {
-          console.log('Fetching ' + data[i].counterparty.split('#')[0])
+          console.log('Fetching ' + data[i].counterparty.split('#')[0]);
           f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
              updateNames();
           });
@@ -368,7 +368,7 @@ angular.module("wallet", [])
         console.log(this);
         console.log(sub);
         this.send('sub ' + sub);
-      }
+      };
 
       socket.onmessage = function(msg){
         console.log('Incoming message : ' + msg);
@@ -381,7 +381,7 @@ angular.module("wallet", [])
             notify = true;
           }
         });
-      }
+      };
     }
   }
 
