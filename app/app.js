@@ -8,10 +8,14 @@ var ACL    = $rdf.Namespace("http://www.w3.org/ns/auth/acl#");
 var CURR   = $rdf.Namespace("https://w3id.org/cc#");
 var CERT   = $rdf.Namespace("http://www.w3.org/ns/auth/cert#");
 var DCT    = $rdf.Namespace("http://purl.org/dc/terms/");
+var FACE   = $rdf.Namespace("https://graph.facebook.com/schema/~/");
 var FOAF   = $rdf.Namespace("http://xmlns.com/foaf/0.1/");
+var LDP    = $rdf.Namespace("http://www.w3.org/ns/ldp#");
 var OWL    = $rdf.Namespace("http://www.w3.org/2002/07/owl#");
+var PIM    = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
 var RDF    = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 var RDFS   = $rdf.Namespace("http://www.w3.org/2000/01/rdf-schema#");
+var SIOC   = $rdf.Namespace("http://rdfs.org/sioc/ns#");
 var SPACE  = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
 var UI     = $rdf.Namespace("http://www.w3.org/ns/ui#");
 
@@ -21,15 +25,69 @@ var g = $rdf.graph();
 var f = $rdf.fetcher(g);
 
 
+var template      = {};
+document.template = template;
+
+
+// init
+var notify          = false;
+var subs            = [];
+var genericphoto    = 'images/generic_photo.png';
+var soundURI        = 'http://webid.im/pinglow.mp3';
+var defaultLdpc     = 'https://klaranet.com/d/chat/'; // hard code for now until more websockets are there
+var defaultIcon     = 'images/money.png';
+var defaultSound    = 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
+var defaultTime     = 5000;
+var defaultWallet   = 'https://klaranet.com/d/user/';
+
+var api             = getParam('api') || 'http://klaranet.com/api/v1/';
+var ldpc            = getParam('ldpc');
+var notifyIcon      = getParam('notifyIcon')  || defaultIcon;
+var notifySound     = getParam('notifySound') || defaultSound;
+var notifyTime      = getParam('notifyTime')  || defaultTime;
+var paymentProvider = getParam('paymentProvider') || defaultWallet;
+var type            = getParam('type');
+var webid           = getParam('webid');
+var wss             = getParam('wss');
+
+
+
+template.init = {
+  api             : api,
+  ldpc            : ldpc,
+  notifyIcon      : notifyIcon,
+  notifySound     : notifySound,
+  notifyTime      : notifyTime,
+  paymentProvider : paymentProvider,
+  type            : type,
+  webid           : webid,
+  wss             : wss
+};
+
+template.settings = {
+  api             : template.init.api,
+  ldpc            : template.init.ldpc,
+  notifyIcon      : template.init.notifyIcon,
+  notifySound     : template.init.notifySound,
+  notifyTime      : template.init.notifyTime,
+  paymentProvider : template.init.paymentProvider,
+  type            : template.init.type,
+  webid           : template.init.webid,
+  wss             : template.init.wss
+};
+
+
+
+
+
+
+
+
+
+
 angular.module("wallet", [])
 .controller("VirtualWallet", function($scope, $http) {
 
-  // init
-  var notifyIcon  = getParam('notifyIcon')  || "images/money.png";
-  var notifySound = getParam('notifySound') || 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
-  var notifyTime  = getParam('notifyTime')  || 10000;
-
-  var notify = false;
 
   var subs         = [];
 
