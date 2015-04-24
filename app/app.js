@@ -187,7 +187,7 @@ angular.module("wallet", [])
 
 
   function updateNames() {
-    console.log('updating names');
+    //console.log('updating names');
     for (var i=0; i<$scope.tx.length; i++) {
       var name = g.any( $rdf.sym($scope.tx[i].counterparty), FOAF('name') );
       if (name) {
@@ -238,7 +238,7 @@ angular.module("wallet", [])
           data[i].parity = 'minus';
         }
         if (data[i].counterparty) {
-          console.log('Fetching ' + data[i].counterparty.split('#')[0]);
+          //console.log('Fetching ' + data[i].counterparty.split('#')[0]);
           f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
              updateNames();
           });
@@ -311,11 +311,12 @@ angular.module("wallet", [])
     // fetch user data
     f.nowOrWhenFetched(webid.split('#')[0],undefined,function(ok, body){
 
-      var person = g.statementsMatching($rdf.sym(webid), RDF('type'), FOAF('Person'))[0];
+      //var person = g.statementsMatching($rdf.sym(webid), RDF('type'), FOAF('Person'))[0];
 
-      console.log(person);
+      //console.log(person);
 
-      var subject = person.subject;
+      //var subject = person.subject;
+      subject = $rdf.sym(webid);
 
       var name = g.any(subject, FOAF('name'));
       var address = g.any(subject, CURR('bitmark')) || g.any(subject, CURR('bitcoin'));
@@ -403,7 +404,7 @@ angular.module("wallet", [])
         console.log('Please add a crypto currency address to your profile to allow withdrawls.');
       }
 
-      console.log(name);
+      //console.log(name);
       console.log(address);
 
     });
