@@ -243,7 +243,7 @@ angular.module("wallet", [])
              updateNames();
           });
         }
-        amount = data[i]['amount'];
+        amount = data[i].amount;
 
         var exists = false;
         for (var j=0; j<$scope.tx.length; j++) {
