@@ -104,12 +104,14 @@ angular.module("wallet", [])
   $scope.tx       = [];
   $scope.history  = false;
   $scope.friends  = [];
+  $scope.webid    = undefined;
 
 
 
   if (localStorage.getItem('webid')) {
 
     webid = localStorage.getItem('webid');
+    $scope.webid = localStorage.getItem('webid');
     hash = CryptoJS.SHA256(webid).toString();
     var ldpc = paymentProvider + hash + '/';
     connectToSocket(wss,  ldpc +',meta', subs);
@@ -119,6 +121,7 @@ angular.module("wallet", [])
     window.addEventListener('WebIDAuth',function(e) {
 
       webid = e.detail.user;
+      $scope.webid= e.detail.user;
       console.log('WebID is : ' + webid);
 
       if(!webid) return;
