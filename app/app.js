@@ -40,6 +40,9 @@ var defaultSound    = 'https://raw.githubusercontent.com/schildbach/bitcoin-wall
 var defaultTime     = 5000;
 var defaultWallet   = 'https://klaranet.com/d/user/';
 
+/*
+
+
 var api             = getParam('api') || 'http://klaranet.com/api/v1/';
 var ldpc            = getParam('ldpc');
 var notifyIcon      = getParam('notifyIcon')  || defaultIcon;
@@ -49,7 +52,6 @@ var paymentProvider = getParam('paymentProvider') || defaultWallet;
 var type            = getParam('type');
 var webid           = getParam('webid');
 var wss             = getParam('wss');
-
 
 
 template.init = {
@@ -76,17 +78,47 @@ template.settings = {
   wss             : template.init.wss
 };
 
+*/
+
+function initialize(template, key, init) {
+  var param = getParam(key);
+  if (!template.init) {
+    template.init = {};
+  }
+  if (!template.settings) {
+    template.settings = {};
+  }
+  template.init[key] = param;
+  if (param) {
+    template.settings[key] = param;
+  } else {
+    template.settings[key] = init;
+  }
+}
 
 
-
-
-
-
+initialize(template, 'api', 'http://klaranet.com/api/v1/');
+initialize(template, 'ldpc');
+initialize(template, 'notifyIcon', defaultIcon);
+initialize(template, 'notifySound', defaultSound);
+initialize(template, 'notifyTime', defaultTime);
+initialize(template, 'paymentProvider', defaultWallet);
+initialize(template, 'type');
+initialize(template, 'webid');
+initialize(template, 'wss');
 
 
 
 angular.module("wallet", [])
 .controller("VirtualWallet", function($scope, $http) {
+
+
+  $scope.modal = function() {
+    console.info('toggling modal');
+    $scope.printSettings = JSON.stringify(template.settings, null, 2);
+    $('#modal').toggle();
+  };
+
 
 
   var subs         = [];
@@ -267,7 +299,7 @@ angular.module("wallet", [])
 
         if(notify){
           var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
-          {'icon': notifyIcon,
+          {'icon': template.settings.notifyIcon,
           "body" : 'With : ' + data[0].counterparty });
           notify = false;
 
@@ -288,11 +320,11 @@ angular.module("wallet", [])
             navigator.vibrate(500);
           }
 
-          playSound(notifySound);
+          playSound(template.settings.notifySound);
 
           setTimeout(function(){
-            notification.close()
-          }, notifyTime);
+            notification.close();
+          }, template.settings.notifyTime);
 
         }
 

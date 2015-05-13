@@ -17,12 +17,15 @@
   <script src="bower_components/webcomponentsjs/webcomponents.js"></script>
   <link rel="import" href="bower_components/core-collapse/core-collapse.html">
   <link rel="import" href="bower_components/core-icons/core-icons.html">
+  <link rel="import" href="bower_components/core-icon/core-icon.html">
   <link rel="import" href="bower_components/core-item/core-item.html">
   <link rel="import" href="bower_components/core-media-query/core-media-query.html">
   <link rel="import" href="bower_components/core-pages/core-pages.html">
   <link rel="import" href="bower_components/core-scaffold/core-scaffold.html">
   <link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
   <link rel="import" href="bower_components/font-roboto/roboto.html">
+  <link rel="import" href="bower_components/paper-button/paper-button.html">
+  <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
   <link rel="import" href="bower_components/paper-dropdown/paper-dropdown.html">
   <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
   <link rel="import" href="bower_components/paper-input/paper-input.html">
@@ -43,7 +46,7 @@
     <paper-icon-button icon="menu"></paper-icon-button>
     <div flex>Virtual Wallet</div>
     <paper-icon-button icon="search"></paper-icon-button>
-    <paper-icon-button icon="more-vert"></paper-icon-button>
+    <paper-icon-button ng-click="modal()" id="settings" icon="settings"></paper-icon-button>
 
     <div class="bottom fit" horizontal layout>
 
@@ -114,6 +117,12 @@
 
 </core-pages>
 
+
+<paper-dialog id="modal">
+  <h3>Settings</h3>
+  <pre>{{printSettings}}</pre>
+  <paper-button on-tap={{modal}} affirmative autofocus></paper-button>
+</paper-dialog>
 
 <!-- detect when window is narrow -->
 <core-media-query id="mediaQuery" query="max-width: 640px"></core-media-query>
