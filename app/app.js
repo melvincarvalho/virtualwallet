@@ -93,10 +93,9 @@ angular.module("wallet", [])
   };
 
 
-
   var subs         = [];
 
-  var api = getParam('api') || 'http://klaranet.com/api/v1/';
+  //var api = getParam('api') || 'http://klaranet.com/api/v1/';
 
   var webid;
 
@@ -221,7 +220,7 @@ angular.module("wallet", [])
 
   function renderbalance() {
     // get balance
-    var balanceURI = api + 'balance?uri=' + encodeURIComponent(webid);
+    var balanceURI = template.settings.api + 'balance?uri=' + encodeURIComponent(webid);
     $http.get(balanceURI).
     success(function(data, status, headers, config) {
       $scope.balance = data['amount'];
@@ -232,7 +231,7 @@ angular.module("wallet", [])
     });
 
     // get history
-    var txURI =  api + 'tx?uri=' + encodeURIComponent(webid);
+    var txURI =  template.settings.api + 'tx?uri=' + encodeURIComponent(webid);
     var jqxhr = $.ajax( txURI )
     .done(function(data) {
 
