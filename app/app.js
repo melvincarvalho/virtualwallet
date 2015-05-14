@@ -31,55 +31,17 @@ document.template = template;
 
 // init
 var notify               = false;
-var defaultNotifications = 'on';
 var subs                 = [];
 var genericphoto         = 'images/generic_photo.png';
 var soundURI             = 'http://webid.im/pinglow.mp3';
 var defaultLdpc          = 'https://klaranet.com/d/chat/'; // hard code for now until more websockets are there
 var defaultIcon          = 'images/money.png';
+var defaultNotifications = 'on';
 var defaultSound         = 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
 var defaultTime          = 5000;
 var defaultWallet        = 'https://klaranet.com/d/user/';
 
-/*
 
-
-var api             = getParam('api') || 'http://klaranet.com/api/v1/';
-var ldpc            = getParam('ldpc');
-var notifyIcon      = getParam('notifyIcon')  || defaultIcon;
-var notifySound     = getParam('notifySound') || defaultSound;
-var notifyTime      = getParam('notifyTime')  || defaultTime;
-var paymentProvider = getParam('paymentProvider') || defaultWallet;
-var type            = getParam('type');
-var webid           = getParam('webid');
-var wss             = getParam('wss');
-
-
-template.init = {
-  api             : api,
-  ldpc            : ldpc,
-  notifyIcon      : notifyIcon,
-  notifySound     : notifySound,
-  notifyTime      : notifyTime,
-  paymentProvider : paymentProvider,
-  type            : type,
-  webid           : webid,
-  wss             : wss
-};
-
-template.settings = {
-  api             : template.init.api,
-  ldpc            : template.init.ldpc,
-  notifyIcon      : template.init.notifyIcon,
-  notifySound     : template.init.notifySound,
-  notifyTime      : template.init.notifyTime,
-  paymentProvider : template.init.paymentProvider,
-  type            : template.init.type,
-  webid           : template.init.webid,
-  wss             : template.init.wss
-};
-
-*/
 
 function initialize(template, key, init) {
   var param = getParam(key);
@@ -104,8 +66,8 @@ initialize(template, 'notifications', defaultNotifications);
 initialize(template, 'notifyIcon', defaultIcon);
 initialize(template, 'notifySound', defaultSound);
 initialize(template, 'notifyTime', defaultTime);
-initialize(template, 'paymentProvider', defaultWallet);
 initialize(template, 'type');
+initialize(template, 'wallet', defaultWallet);
 initialize(template, 'webid');
 initialize(template, 'wss');
 
@@ -113,6 +75,15 @@ initialize(template, 'wss');
 
 angular.module("wallet", [])
 .controller("VirtualWallet", function($scope, $http) {
+
+
+  function playSound(uri) {
+    var sound = new Howl({
+      urls: [uri],
+      volume: 0.9
+    }).play();
+    navigator.vibrate(500);
+  }
 
 
   $scope.modal = function() {
@@ -126,11 +97,10 @@ angular.module("wallet", [])
   var subs         = [];
 
   var api = getParam('api') || 'http://klaranet.com/api/v1/';
-  var paymentProvider = getParam('paymentProvider') || 'https://klaranet.com/d/user/';
 
   var webid;
 
-  var wss = 'wss://' + paymentProvider.split('/')[2];
+  var wss = 'wss://' + template.settings.wallet.split('/')[2];
 
   $scope.balance  = 0;
   $scope.selected = 0;
@@ -147,7 +117,7 @@ angular.module("wallet", [])
     webid = localStorage.getItem('webid');
     $scope.webid = localStorage.getItem('webid');
     hash = CryptoJS.SHA256(webid).toString();
-    var ldpc = paymentProvider + hash + '/';
+    var ldpc = template.settings.wallet + hash + '/';
     connectToSocket(wss,  ldpc +',meta', subs);
     render();
 
@@ -160,7 +130,7 @@ angular.module("wallet", [])
 
       if(!webid) return;
       hash = CryptoJS.SHA256(webid).toString();
-      var ldpc = paymentProvider + hash + '/';
+      var ldpc = template.settings.wallet + hash + '/';
       connectToSocket(wss,  ldpc +',meta', subs);
 
       localStorage.setItem('webid', e.detail.user);
@@ -207,11 +177,11 @@ angular.module("wallet", [])
       xhr.send(data);
     }
 
-    putFile(paymentProvider + hash + '/2', wc);
+    putFile(template.settings.wallet + hash + '/2', wc);
     console.log(wc);
 
     $.ajax({
-      url: paymentProvider + hash + '/,meta',
+      url: template.settings.wallet + hash + '/,meta',
       contentType: "text/turtle",
       type: 'PUT',
       data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
@@ -314,14 +284,6 @@ angular.module("wallet", [])
             }
           };
 
-          function playSound(uri) {
-            var sound = new Howl({
-              urls: [uri],
-              volume: 0.9
-            }).play();
-            navigator.vibrate(500);
-          }
-
           playSound(template.settings.notifySound);
 
           setTimeout(function(){
@@ -421,11 +383,11 @@ angular.module("wallet", [])
           wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
           wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
 
-          putFile(paymentProvider + hash + '/1', wc);
+          putFile(template.settings.wallet + hash + '/1', wc);
 
 
           $.ajax({
-            url: paymentProvider + hash + '/,meta',
+            url: template.settings.wallet + hash + '/,meta',
             contentType: "text/turtle",
             type: 'PUT',
             data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
@@ -441,7 +403,6 @@ angular.module("wallet", [])
         console.log('Please add a crypto currency address to your profile to allow withdrawls.');
       }
 
-      //console.log(name);
       console.log(address);
 
     });
