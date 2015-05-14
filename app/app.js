@@ -30,15 +30,16 @@ document.template = template;
 
 
 // init
-var notify          = false;
-var subs            = [];
-var genericphoto    = 'images/generic_photo.png';
-var soundURI        = 'http://webid.im/pinglow.mp3';
-var defaultLdpc     = 'https://klaranet.com/d/chat/'; // hard code for now until more websockets are there
-var defaultIcon     = 'images/money.png';
-var defaultSound    = 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
-var defaultTime     = 5000;
-var defaultWallet   = 'https://klaranet.com/d/user/';
+var notify               = false;
+var defaultNotifications = 'on';
+var subs                 = [];
+var genericphoto         = 'images/generic_photo.png';
+var soundURI             = 'http://webid.im/pinglow.mp3';
+var defaultLdpc          = 'https://klaranet.com/d/chat/'; // hard code for now until more websockets are there
+var defaultIcon          = 'images/money.png';
+var defaultSound         = 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
+var defaultTime          = 5000;
+var defaultWallet        = 'https://klaranet.com/d/user/';
 
 /*
 
@@ -99,6 +100,7 @@ function initialize(template, key, init) {
 
 initialize(template, 'api', 'http://klaranet.com/api/v1/');
 initialize(template, 'ldpc');
+initialize(template, 'notifications', defaultNotifications);
 initialize(template, 'notifyIcon', defaultIcon);
 initialize(template, 'notifySound', defaultSound);
 initialize(template, 'notifyTime', defaultTime);
@@ -297,7 +299,7 @@ angular.module("wallet", [])
 
       if (found) {
 
-        if(notify){
+        if(notify && template.settings.notifications === 'on'){
           var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
           {'icon': template.settings.notifyIcon,
           "body" : 'With : ' + data[0].counterparty });
