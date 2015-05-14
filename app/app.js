@@ -193,19 +193,18 @@ angular.module("wallet", [])
 
 
   function updateNames() {
-    //console.log('updating names');
-    for (var i=0; i<$scope.tx.length; i++) {
-      var name = g.any( $rdf.sym($scope.tx[i].counterparty), FOAF('name') );
+    var i;
+    var name;
+    for (i=0; i<$scope.tx.length; i++) {
+      name = g.any( $rdf.sym($scope.tx[i].counterparty), FOAF('name') );
       if (name) {
         $scope.tx[i].name = name.value;
-        //console.log($scope.tx[i].name);
       }
     }
-    for (var i=0; i<$scope.friends.length; i++) {
-      var name = g.any( $rdf.sym($scope.friends[i].id), FOAF('name') );
+    for (i=0; i<$scope.friends.length; i++) {
+      name = g.any( $rdf.sym($scope.friends[i].id), FOAF('name') );
       if (name) {
         $scope.friends[i].name = name.value;
-        //console.log($scope.tx[i].name);
       }
     }
     $scope.$apply();
@@ -223,7 +222,7 @@ angular.module("wallet", [])
     var balanceURI = template.settings.api + 'balance?uri=' + encodeURIComponent(webid);
     $http.get(balanceURI).
     success(function(data, status, headers, config) {
-      $scope.balance = data['amount'];
+      $scope.balance = data.amount;
     }).
     error(function(data, status, headers, config) {
       // log error
