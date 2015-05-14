@@ -215,6 +215,11 @@ angular.module("wallet", [])
   function render() {
     $('webid-login').hide();
 
+    renderbalance();
+    renderpay();
+  }
+
+  function renderbalance() {
     // get balance
     var balanceURI = api + 'balance?uri=' + encodeURIComponent(webid);
     $http.get(balanceURI).
@@ -301,10 +306,8 @@ angular.module("wallet", [])
     document.querySelector('paper-tabs').selected = 0;
 
     $scope.$apply();
-    renderpay();
+
   }
-
-
   function renderpay() {
 
     // fetch user data
