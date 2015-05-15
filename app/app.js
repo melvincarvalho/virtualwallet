@@ -95,8 +95,6 @@ angular.module("wallet", [])
 
   var subs         = [];
 
-  //var api = getParam('api') || 'http://klaranet.com/api/v1/';
-
   var webid;
 
   var wss = 'wss://' + template.settings.wallet.split('/')[2];
