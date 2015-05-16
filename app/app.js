@@ -132,24 +132,22 @@ angular.module("wallet", [])
 
   // QUEUE
   function updateQueue() {
+    var i;
     console.log('updating queue');
 
     var knows = g.statementsMatching($rdf.sym(webid), FOAF('knows'), undefined);
-    for (var i=0; i<knows.length; i++) {
+    for (i=0; i<knows.length; i++) {
       //console.log(knows[i].object.uri);
-      addToQueue(knows[i].object.uri);
+      addToFriends($scope.friends, {id: knows[i].object.value, label: knows[i].object.value});
+      addToQueue(template.settings.queue, knows[i].object.uri);
     }
 
-
-  }
-
-  function addToQueue(uri) {
-    for (var i=0; i<template.settings.queue.length; i++) {
-      if (template.settings.queue[i] === uri) {
-        return;
-      }
+    for (i=0; i<$scope.tx.length; i++) {
+      //console.log($scope.tx[i].source);
+      addToQueue(template.settings.queue, $scope.tx[i].source);
+      addToQueue(template.settings.queue, $scope.tx[i].destination);
     }
-    template.settings.queue.push(uri);
+
   }
 
   function daemon() {
@@ -158,10 +156,132 @@ angular.module("wallet", [])
 		setInterval(function() {
 
 			console.log('ping');
+
 			render();
 
 	  }, heartbeat * 1000);
 	}
+
+
+  // FETCH
+  function fetchAll() {
+
+    updateQueue();
+
+    //if (template.settings.queue.length === 0) return;
+
+    for (var i=0; i<template.settings.queue.length; i++) {
+      if (f.getState(template.settings.queue[i].split('#')[0]) === 'unrequested') {
+        fetch(template.settings.queue[i]);
+      }
+    }
+
+  }
+
+  function fetch(uri) {
+    console.log('fetching ' + uri);
+    f.nowOrWhenFetched(uri.split('#')[0],undefined, function(ok, body) {
+       render();
+       fetchAll();
+    });
+  }
+
+  function fetchBalance(refresh) {
+    if (!refresh && $scope.balance !== undefined) return;
+
+    // get balance
+    var balanceURI = template.settings.api + 'balance?uri=' + encodeURIComponent(webid);
+    $http.get(balanceURI).
+    success(function(data, status, headers, config) {
+      $scope.balance = data.amount;
+    }).
+    error(function(data, status, headers, config) {
+      // log error
+      console.log(data);
+    });
+  }
+
+
+  function fetchTx(refresh) {
+    if (!refresh && $scope.tx.length !== 0) return;
+
+    // get history
+    var txURI =  template.settings.api + 'tx?uri=' + encodeURIComponent(webid);
+    var jqxhr = $.ajax( txURI )
+    .done(function(data) {
+
+      var found = false;
+
+      console.log('num cached tx : ' + $scope.tx.length);
+      console.log('num recieved tx : ' + data.length);
+
+      var amount;
+      for( var i=0; i<data.length; i++) {
+        data[i].counterparty = data[i].source;
+        data[i].parity = 'plus';
+        if (data[i].counterparty === webid) {
+          data[i].counterparty = data[i].destination;
+          data[i].parity = 'minus';
+        }
+        if (data[i].counterparty) {
+          //console.log('Fetching ' + data[i].counterparty.split('#')[0]);
+          //addToQueue(data[i].counterparty);
+          /*
+          f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
+             renderNames();
+          });
+          */
+        }
+        amount = data[i].amount;
+
+        var exists = false;
+        for (var j=0; j<$scope.tx.length; j++) {
+          if ($scope.tx[j] && $scope.tx[j]['@id'] === data[i]['@id']) {
+            exists = true;
+            break;
+          }
+        }
+        if (!exists) {
+          $scope.tx.unshift(data[i]);
+          found = true;
+          $scope.$apply();
+        }
+      }
+
+
+      if (found) {
+
+        if(notify && template.settings.notifications === 'on'){
+          var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
+          {'icon': template.settings.notifyIcon,
+          "body" : 'With : ' + data[0].counterparty });
+          notify = false;
+
+          notification.onclick = function(x) {
+            try {
+              window.focus();
+              this.cancel();
+            }
+            catch (ex) {
+            }
+          };
+
+          playSound(template.settings.notifySound);
+
+          setTimeout(function(){
+            notification.close();
+          }, template.settings.notifyTime);
+
+        }
+
+      }
+
+    })
+    .fail(function() {
+      console.log('could not get tx history');
+    });
+
+  }
 
 
   // RENDER
@@ -205,7 +325,7 @@ angular.module("wallet", [])
 
       var name = g.any(subject, FOAF('name'));
       var address = g.any(subject, CURR('bitmark')) || g.any(subject, CURR('bitcoin'));
-
+/*
       var knows = g.statementsMatching($rdf.sym(webid), FOAF('knows'), undefined);
       if ( knows.length > 0 ) {
         for (var i=0; i<knows.length; i++) {
@@ -222,7 +342,7 @@ angular.module("wallet", [])
 
 
       }
-
+*/
       if (address) {
         address = address.value;
 
@@ -368,124 +488,34 @@ angular.module("wallet", [])
   }
 
 
-  // FETCH
-  function fetchAll() {
-
-    updateQueue();
-
-    if (template.settings.queue.length === 0) return;
-
-    for (var i=0; i<template.settings.queue.length; i++) {
-      if (f.getState(template.settings.queue[i].split('#')[0]) === 'unrequested') {
-        fetch(template.settings.queue[i]);
-      }
-    }
-
-  }
-
-  function fetch(uri) {
-    console.log('fetching ' + uri);
-    f.nowOrWhenFetched(uri.split('#')[0],undefined, function(ok, body) {
-       fetchAll();
-    });
-  }
-
-  function fetchBalance(refresh) {
-    if (!refresh && $scope.balance !== undefined) return;
-
-    // get balance
-    var balanceURI = template.settings.api + 'balance?uri=' + encodeURIComponent(webid);
-    $http.get(balanceURI).
-    success(function(data, status, headers, config) {
-      $scope.balance = data.amount;
-    }).
-    error(function(data, status, headers, config) {
-      // log error
-      console.log(data);
-    });
-  }
-
-
-  function fetchTx(refresh) {
-    if (!refresh && $scope.tx.length !== 0) return;
-
-    // get history
-    var txURI =  template.settings.api + 'tx?uri=' + encodeURIComponent(webid);
-    var jqxhr = $.ajax( txURI )
-    .done(function(data) {
-
-      var found = false;
-
-      console.log('num cached tx : ' + $scope.tx.length);
-      console.log('num recieved tx : ' + data.length);
-
-      var amount;
-      for( var i=0; i<data.length; i++) {
-        data[i].counterparty = data[i].source;
-        data[i].parity = 'plus';
-        if (data[i].counterparty === webid) {
-          data[i].counterparty = data[i].destination;
-          data[i].parity = 'minus';
-        }
-        if (data[i].counterparty) {
-          //console.log('Fetching ' + data[i].counterparty.split('#')[0]);
-          f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
-             renderNames();
-          });
-        }
-        amount = data[i].amount;
-
-        var exists = false;
-        for (var j=0; j<$scope.tx.length; j++) {
-          if ($scope.tx[j] && $scope.tx[j]['@id'] === data[i]['@id']) {
-            exists = true;
-            break;
-          }
-        }
-        if (!exists) {
-          $scope.tx.unshift(data[i]);
-          found = true;
-          $scope.$apply();
-        }
-      }
-
-
-      if (found) {
-
-        if(notify && template.settings.notifications === 'on'){
-          var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
-          {'icon': template.settings.notifyIcon,
-          "body" : 'With : ' + data[0].counterparty });
-          notify = false;
-
-          notification.onclick = function(x) {
-            try {
-              window.focus();
-              this.cancel();
-            }
-            catch (ex) {
-            }
-          };
-
-          playSound(template.settings.notifySound);
-
-          setTimeout(function(){
-            notification.close();
-          }, template.settings.notifyTime);
-
-        }
-
-      }
-
-    })
-    .fail(function() {
-      console.log('could not get tx history');
-    });
-
-  }
 
 
   // HELPER
+  function addToArray(array, el) {
+    if (!array) return;
+    if (array.indexOf(el) === -1) {
+      array.push(el);
+    }
+  }
+
+  function addToQueue(array, el) {
+    if (!array) return;
+    if (array.indexOf(el) === -1) {
+      array.push(el);
+    }
+  }
+
+  function addToFriends(array, el) {
+    if (!array) return;
+    for (var i=0; i<array.length; i++) {
+      if (array[i].id === el.id) {
+        return;
+      }
+    }
+    array.push(el);
+  }
+
+
   function playSound(uri) {
     var sound = new Howl({
       urls: [uri],
