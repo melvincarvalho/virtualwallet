@@ -71,26 +71,11 @@ initialize(template, 'wallet', defaultWallet);
 initialize(template, 'webid');
 initialize(template, 'wss');
 
+template.settings.queue = [];
 
 
 angular.module("wallet", [])
 .controller("VirtualWallet", function($scope, $http) {
-
-
-  function playSound(uri) {
-    var sound = new Howl({
-      urls: [uri],
-      volume: 0.9
-    }).play();
-    navigator.vibrate(500);
-  }
-
-
-  $scope.modal = function() {
-    console.info('toggling modal');
-    $scope.printSettings = JSON.stringify(template.settings, null, 2);
-    $('#modal').toggle();
-  };
 
 
   var subs         = [];
@@ -99,7 +84,7 @@ angular.module("wallet", [])
 
   var wss = 'wss://' + template.settings.wallet.split('/')[2];
 
-  $scope.balance  = 0;
+  $scope.balance  = undefined;
   $scope.selected = 0;
   $scope.currency = 'bits';
   $scope.tx       = [];
@@ -108,7 +93,7 @@ angular.module("wallet", [])
   $scope.webid    = undefined;
 
 
-
+  // get webid from login or cache
   if (localStorage.getItem('webid')) {
 
     webid = localStorage.getItem('webid');
@@ -116,7 +101,10 @@ angular.module("wallet", [])
     hash = CryptoJS.SHA256(webid).toString();
     var ldpc = template.settings.wallet + hash + '/';
     connectToSocket(wss,  ldpc +',meta', subs);
+    template.settings.queue.push(webid);
+    fetchAll();
     render();
+    daemon();
 
   } else {
     window.addEventListener('WebIDAuth',function(e) {
@@ -131,180 +119,79 @@ angular.module("wallet", [])
       connectToSocket(wss,  ldpc +',meta', subs);
 
       localStorage.setItem('webid', e.detail.user);
+      template.settings.queue.push(webid);
+      fetchAll();
       render();
+      daemon();
 
     });
   }
 
+  addEvents();
 
 
-  $( "#sendbutton" ).click(function( event ) {
-    var source = $('#source').val();
-    var destination = $('#friendsselect').val();
-    destination = $scope.friend.id;
-    var amount = $('#sendamount').val();
+  // QUEUE
+  function updateQueue() {
+    console.log('updating queue');
 
-    var err = '';
-
-    if(!amount) err +=('Please enter an amount\n');
-
-    if (isNaN(amount)) err += ('Amount must be a number');
-    amount = parseFloat(amount);
-
-    if(err !== '') {
-      alert(err);
-      return false;
+    var knows = g.statementsMatching($rdf.sym(webid), FOAF('knows'), undefined);
+    for (var i=0; i<knows.length; i++) {
+      //console.log(knows[i].object.uri);
+      addToQueue(knows[i].object.uri);
     }
 
-    console.log(amount);
 
-    var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
-    wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
-    wc += '  <https://w3id.org/cc#destination> \n    <' + destination + '> ;\n';
-    wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
-    wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
-
-
-    var hash = CryptoJS.SHA256(webid).toString();
-
-    function putFile(file, data) {
-      xhr = new XMLHttpRequest();
-      xhr.open('PUT', file, false);
-      xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
-      xhr.send(data);
-    }
-
-    putFile(template.settings.wallet + hash + '/2', wc);
-    console.log(wc);
-
-    $.ajax({
-      url: template.settings.wallet + hash + '/,meta',
-      contentType: "text/turtle",
-      type: 'PUT',
-      data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
-      success: function(result) {
-      }
-    });
-
-  });
-
-
-
-  function updateNames() {
-    var i;
-    var name;
-    for (i=0; i<$scope.tx.length; i++) {
-      name = g.any( $rdf.sym($scope.tx[i].counterparty), FOAF('name') );
-      if (name) {
-        $scope.tx[i].name = name.value;
-      }
-    }
-    for (i=0; i<$scope.friends.length; i++) {
-      name = g.any( $rdf.sym($scope.friends[i].id), FOAF('name') );
-      if (name) {
-        $scope.friends[i].name = name.value;
-      }
-    }
-    $scope.$apply();
   }
 
-  function render() {
-    $('webid-login').hide();
-
-    renderbalance();
-    renderpay();
+  function addToQueue(uri) {
+    for (var i=0; i<template.settings.queue.length; i++) {
+      if (template.settings.queue[i] === uri) {
+        return;
+      }
+    }
+    template.settings.queue.push(uri);
   }
 
-  function renderbalance() {
-    // get balance
-    var balanceURI = template.settings.api + 'balance?uri=' + encodeURIComponent(webid);
-    $http.get(balanceURI).
-    success(function(data, status, headers, config) {
-      $scope.balance = data.amount;
-    }).
-    error(function(data, status, headers, config) {
-      // log error
-      console.log(data);
-    });
+  function daemon() {
+		var heartbeat = 60;
 
-    // get history
-    var txURI =  template.settings.api + 'tx?uri=' + encodeURIComponent(webid);
-    var jqxhr = $.ajax( txURI )
-    .done(function(data) {
+		setInterval(function() {
 
-      var found = false;
+			console.log('ping');
+			render();
 
-      console.log('num cached tx : ' + $scope.tx.length);
-      console.log('num recieved tx : ' + data.length);
-
-      var amount;
-      for( var i=0; i<data.length; i++) {
-        data[i].counterparty = data[i]['source'];
-        data[i].parity = 'plus';
-        if (data[i].counterparty === webid) {
-          data[i].counterparty = data[i]['destination'];
-          data[i].parity = 'minus';
-        }
-        if (data[i].counterparty) {
-          //console.log('Fetching ' + data[i].counterparty.split('#')[0]);
-          f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
-             updateNames();
-          });
-        }
-        amount = data[i].amount;
-
-        var exists = false;
-        for (var j=0; j<$scope.tx.length; j++) {
-          if ($scope.tx[j] && $scope.tx[j]['@id'] === data[i]['@id']) {
-            exists = true;
-            break;
-          }
-        }
-        if (!exists) {
-          $scope.tx.unshift(data[i]);
-          found = true;
-          $scope.$apply();
-        }
-      }
+	  }, heartbeat * 1000);
+	}
 
 
-      if (found) {
+  // RENDER
+  function render(refresh) {
+    renderLogin(refresh);
+    renderBalance(refresh);
+    renderTx(refresh);
+    renderPay(refresh);
+    renderNames(refresh);
 
-        if(notify && template.settings.notifications === 'on'){
-          var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
-          {'icon': template.settings.notifyIcon,
-          "body" : 'With : ' + data[0].counterparty });
-          notify = false;
-
-          notification.onclick = function(x) {
-            try {
-              window.focus();
-              this.cancel();
-            }
-            catch (ex) {
-            }
-          };
-
-          playSound(template.settings.notifySound);
-
-          setTimeout(function(){
-            notification.close();
-          }, template.settings.notifyTime);
-
-        }
-
-      }
-
-    })
-    .fail(function() {
-      console.log('could not get tx history');
-    });
     document.querySelector('paper-tabs').selected = 0;
 
     $scope.$apply();
 
   }
-  function renderpay() {
+
+  function renderLogin() {
+    $('webid-login').hide();
+  }
+
+
+  function renderBalance(refresh) {
+    fetchBalance(refresh);
+  }
+
+  function renderTx(refresh) {
+    fetchTx(refresh);
+  }
+
+  function renderPay() {
 
     // fetch user data
     f.nowOrWhenFetched(webid.split('#')[0],undefined,function(ok, body){
@@ -323,16 +210,15 @@ angular.module("wallet", [])
       if ( knows.length > 0 ) {
         for (var i=0; i<knows.length; i++) {
           var know = knows[i];
-          console.log(know.object.value);
+          //console.log(know.object.value);
           $scope.friends.push({id: know.object.value, label: know.object.value});
           if (know.object.value) {
             f.nowOrWhenFetched(know.object.value.split('#')[0],undefined, function(ok, body) {
-               updateNames();
+               renderNames();
             });
           }
         }
         $scope.friend = $scope.friends[0];
-        console.log($scope.friends);
 
 
       }
@@ -409,6 +295,212 @@ angular.module("wallet", [])
     $scope.$apply();
   }
 
+  function renderNames() {
+    var i;
+    var name;
+    for (i=0; i<$scope.tx.length; i++) {
+      name = g.any( $rdf.sym($scope.tx[i].counterparty), FOAF('name') );
+      if (name) {
+        $scope.tx[i].name = name.value;
+      }
+    }
+    for (i=0; i<$scope.friends.length; i++) {
+      name = g.any( $rdf.sym($scope.friends[i].id), FOAF('name') );
+      if (name) {
+        $scope.friends[i].name = name.value;
+      }
+    }
+    $scope.$apply();
+  }
+
+
+  function addEvents() {
+    $( "#sendbutton" ).click(function( event ) {
+      var source = $('#source').val();
+      var destination = $('#friendsselect').val();
+      destination = $scope.friend.id;
+      var amount = $('#sendamount').val();
+
+      var err = '';
+
+      if(!amount) err +=('Please enter an amount\n');
+
+      if (isNaN(amount)) err += ('Amount must be a number');
+      amount = parseFloat(amount);
+
+      if(err !== '') {
+        alert(err);
+        return false;
+      }
+
+      console.log(amount);
+
+      var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
+      wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
+      wc += '  <https://w3id.org/cc#destination> \n    <' + destination + '> ;\n';
+      wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
+      wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
+
+
+      var hash = CryptoJS.SHA256(webid).toString();
+
+      function putFile(file, data) {
+        xhr = new XMLHttpRequest();
+        xhr.open('PUT', file, false);
+        xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
+        xhr.send(data);
+      }
+
+      putFile(template.settings.wallet + hash + '/2', wc);
+      console.log(wc);
+
+      $.ajax({
+        url: template.settings.wallet + hash + '/,meta',
+        contentType: "text/turtle",
+        type: 'PUT',
+        data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
+        success: function(result) {
+        }
+      });
+
+    });
+
+  }
+
+
+  // FETCH
+  function fetchAll() {
+
+    updateQueue();
+
+    if (template.settings.queue.length === 0) return;
+
+    for (var i=0; i<template.settings.queue.length; i++) {
+      if (f.getState(template.settings.queue[i].split('#')[0]) === 'unrequested') {
+        fetch(template.settings.queue[i]);
+      }
+    }
+
+  }
+
+  function fetch(uri) {
+    console.log('fetching ' + uri);
+    f.nowOrWhenFetched(uri.split('#')[0],undefined, function(ok, body) {
+       fetchAll();
+    });
+  }
+
+  function fetchBalance(refresh) {
+    if (!refresh && $scope.balance !== undefined) return;
+
+    // get balance
+    var balanceURI = template.settings.api + 'balance?uri=' + encodeURIComponent(webid);
+    $http.get(balanceURI).
+    success(function(data, status, headers, config) {
+      $scope.balance = data.amount;
+    }).
+    error(function(data, status, headers, config) {
+      // log error
+      console.log(data);
+    });
+  }
+
+
+  function fetchTx(refresh) {
+    if (!refresh && $scope.tx.length !== 0) return;
+
+    // get history
+    var txURI =  template.settings.api + 'tx?uri=' + encodeURIComponent(webid);
+    var jqxhr = $.ajax( txURI )
+    .done(function(data) {
+
+      var found = false;
+
+      console.log('num cached tx : ' + $scope.tx.length);
+      console.log('num recieved tx : ' + data.length);
+
+      var amount;
+      for( var i=0; i<data.length; i++) {
+        data[i].counterparty = data[i].source;
+        data[i].parity = 'plus';
+        if (data[i].counterparty === webid) {
+          data[i].counterparty = data[i].destination;
+          data[i].parity = 'minus';
+        }
+        if (data[i].counterparty) {
+          //console.log('Fetching ' + data[i].counterparty.split('#')[0]);
+          f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
+             renderNames();
+          });
+        }
+        amount = data[i].amount;
+
+        var exists = false;
+        for (var j=0; j<$scope.tx.length; j++) {
+          if ($scope.tx[j] && $scope.tx[j]['@id'] === data[i]['@id']) {
+            exists = true;
+            break;
+          }
+        }
+        if (!exists) {
+          $scope.tx.unshift(data[i]);
+          found = true;
+          $scope.$apply();
+        }
+      }
+
+
+      if (found) {
+
+        if(notify && template.settings.notifications === 'on'){
+          var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
+          {'icon': template.settings.notifyIcon,
+          "body" : 'With : ' + data[0].counterparty });
+          notify = false;
+
+          notification.onclick = function(x) {
+            try {
+              window.focus();
+              this.cancel();
+            }
+            catch (ex) {
+            }
+          };
+
+          playSound(template.settings.notifySound);
+
+          setTimeout(function(){
+            notification.close();
+          }, template.settings.notifyTime);
+
+        }
+
+      }
+
+    })
+    .fail(function() {
+      console.log('could not get tx history');
+    });
+
+  }
+
+
+  // HELPER
+  function playSound(uri) {
+    var sound = new Howl({
+      urls: [uri],
+      volume: 0.9
+    }).play();
+    navigator.vibrate(500);
+  }
+
+
+  $scope.modal = function() {
+    console.info('toggling modal');
+    $scope.printSettings = JSON.stringify(template.settings, null, 2);
+    $('#modal').toggle();
+  };
+
 
   function connectToSocket(uri, sub, subs) {
 
@@ -429,7 +521,7 @@ angular.module("wallet", [])
       socket.onmessage = function(msg){
         console.log('Incoming message : ' + msg);
 
-        render();
+        render(true);
 
         Notification.requestPermission(function (permission) {
           // If the user is okay, let's create a notification
