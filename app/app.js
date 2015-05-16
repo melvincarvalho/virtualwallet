@@ -36,6 +36,7 @@ var genericphoto         = 'images/generic_photo.png';
 var soundURI             = 'http://webid.im/pinglow.mp3';
 var defaultLdpc          = 'https://klaranet.com/d/chat/'; // hard code for now until more websockets are there
 var defaultIcon          = 'images/money.png';
+var defaultInbox         = 'https://klaranet.com/d/user/';
 var defaultNotifications = 'on';
 var defaultSound         = 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
 var defaultTime          = 5000;
@@ -61,6 +62,7 @@ function initialize(template, key, init) {
 
 
 initialize(template, 'api', 'http://klaranet.com/api/v1/');
+initialize(template, 'inbox', defaultInbox);
 initialize(template, 'ldpc');
 initialize(template, 'notifications', defaultNotifications);
 initialize(template, 'notifyIcon', defaultIcon);
@@ -71,7 +73,7 @@ initialize(template, 'wallet', defaultWallet);
 initialize(template, 'webid');
 initialize(template, 'wss');
 
-template.settings.queue = [];
+template.queue = [];
 
 
 angular.module("wallet", [])
@@ -101,7 +103,7 @@ angular.module("wallet", [])
     hash = CryptoJS.SHA256(webid).toString();
     var ldpc = template.settings.wallet + hash + '/';
     connectToSocket(wss,  ldpc +',meta', subs);
-    template.settings.queue.push(webid);
+    template.queue.push(webid);
     fetchAll();
     render();
     daemon();
@@ -119,7 +121,7 @@ angular.module("wallet", [])
       connectToSocket(wss,  ldpc +',meta', subs);
 
       localStorage.setItem('webid', e.detail.user);
-      template.settings.queue.push(webid);
+      template.queue.push(webid);
       fetchAll();
       render();
       daemon();
@@ -139,13 +141,20 @@ angular.module("wallet", [])
     for (i=0; i<knows.length; i++) {
       //console.log(knows[i].object.uri);
       addToFriends($scope.friends, {id: knows[i].object.value, label: knows[i].object.value});
-      addToQueue(template.settings.queue, knows[i].object.uri);
+      addToQueue(template.queue, knows[i].object.uri);
+    }
+
+    var wallets = g.statementsMatching($rdf.sym(webid), CURR('wallet'), undefined);
+    for (i=0; i<wallets.length; i++) {
+      console.log('wallet found : ' + wallets[i].object.value);
+      template.settings.wallet = wallets[i].object.value;
+      addToQueue(template.queue, wallets[i].object.value);
     }
 
     for (i=0; i<$scope.tx.length; i++) {
       //console.log($scope.tx[i].source);
-      addToQueue(template.settings.queue, $scope.tx[i].source);
-      addToQueue(template.settings.queue, $scope.tx[i].destination);
+      addToQueue(template.queue, $scope.tx[i].source);
+      addToQueue(template.queue, $scope.tx[i].destination);
     }
 
   }
@@ -168,11 +177,11 @@ angular.module("wallet", [])
 
     updateQueue();
 
-    //if (template.settings.queue.length === 0) return;
+    //if (template.queue.length === 0) return;
 
-    for (var i=0; i<template.settings.queue.length; i++) {
-      if (f.getState(template.settings.queue[i].split('#')[0]) === 'unrequested') {
-        fetch(template.settings.queue[i]);
+    for (var i=0; i<template.queue.length; i++) {
+      if (f.getState(template.queue[i].split('#')[0]) === 'unrequested') {
+        fetch(template.queue[i]);
       }
     }
 
@@ -188,6 +197,7 @@ angular.module("wallet", [])
 
   function fetchBalance(refresh) {
     if (!refresh && $scope.balance !== undefined) return;
+    if (!template.settings.api) return;
 
     // get balance
     var balanceURI = template.settings.api + 'balance?uri=' + encodeURIComponent(webid);
@@ -305,6 +315,11 @@ angular.module("wallet", [])
 
   function renderBalance(refresh) {
     fetchBalance(refresh);
+    var description = g.any($rdf.sym(template.settings.wallet), DCT('description'));
+    if (description) {
+      $scope.description = description.value;      
+    }
+    console.log('description : ' + description);
   }
 
   function renderTx(refresh) {
@@ -388,11 +403,11 @@ angular.module("wallet", [])
           wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
           wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
 
-          putFile(template.settings.wallet + hash + '/1', wc);
+          putFile(template.settings.inbox + hash + '/1', wc);
 
 
           $.ajax({
-            url: template.settings.wallet + hash + '/,meta',
+            url: template.settings.inbox + hash + '/,meta',
             contentType: "text/turtle",
             type: 'PUT',
             data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
@@ -471,11 +486,11 @@ angular.module("wallet", [])
         xhr.send(data);
       }
 
-      putFile(template.settings.wallet + hash + '/2', wc);
+      putFile(template.settings.inbox + hash + '/2', wc);
       console.log(wc);
 
       $.ajax({
-        url: template.settings.wallet + hash + '/,meta',
+        url: template.settings.inbox + hash + '/,meta',
         contentType: "text/turtle",
         type: 'PUT',
         data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
