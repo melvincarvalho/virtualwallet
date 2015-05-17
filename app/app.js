@@ -197,7 +197,10 @@ angular.module("wallet", [])
 
   function fetchBalance(refresh) {
     if (!refresh && $scope.balance !== undefined) return;
+
+    template.settings.api = g.any($rdf.sym(template.settings.wallet), CURR('api'));
     if (!template.settings.api) return;
+    template.settings.api = template.settings.api.uri;
 
     // get balance
     var balanceURI = template.settings.api + 'balance?uri=' + encodeURIComponent(webid);
@@ -214,6 +217,8 @@ angular.module("wallet", [])
 
   function fetchTx(refresh) {
     if (!refresh && $scope.tx.length !== 0) return;
+
+    if (!template.settings.api) return;
 
     // get history
     var txURI =  template.settings.api + 'tx?uri=' + encodeURIComponent(webid);
@@ -317,7 +322,7 @@ angular.module("wallet", [])
     fetchBalance(refresh);
     var description = g.any($rdf.sym(template.settings.wallet), DCT('description'));
     if (description) {
-      $scope.description = description.value;      
+      $scope.description = description.value;
     }
     console.log('description : ' + description);
   }
