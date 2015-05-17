@@ -160,16 +160,16 @@ angular.module("wallet", [])
   }
 
   function daemon() {
-		var heartbeat = 60;
+    var heartbeat = 60;
 
-		setInterval(function() {
+    setInterval(function() {
 
-			console.log('ping');
+      console.log('ping');
 
-			render();
+      render();
 
-	  }, heartbeat * 1000);
-	}
+    }, heartbeat * 1000);
+  }
 
 
   // FETCH
@@ -190,8 +190,8 @@ angular.module("wallet", [])
   function fetch(uri) {
     console.log('fetching ' + uri);
     f.nowOrWhenFetched(uri.split('#')[0],undefined, function(ok, body) {
-       render();
-       fetchAll();
+      render();
+      fetchAll();
     });
   }
 
@@ -243,344 +243,327 @@ angular.module("wallet", [])
           //addToQueue(data[i].counterparty);
           /*
           f.nowOrWhenFetched(data[i].counterparty.split('#')[0],undefined, function(ok, body) {
-             renderNames();
-          });
-          */
-        }
-        amount = data[i].amount;
+          renderNames();
+        });
+        */
+      }
+      amount = data[i].amount;
 
-        var exists = false;
-        for (var j=0; j<$scope.tx.length; j++) {
-          if ($scope.tx[j] && $scope.tx[j]['@id'] === data[i]['@id']) {
-            exists = true;
-            break;
-          }
-        }
-        if (!exists) {
-          $scope.tx.unshift(data[i]);
-          found = true;
-          $scope.$apply();
+      var exists = false;
+      for (var j=0; j<$scope.tx.length; j++) {
+        if ($scope.tx[j] && $scope.tx[j]['@id'] === data[i]['@id']) {
+          exists = true;
+          break;
         }
       }
-
-
-      if (found) {
-
-        if(notify && template.settings.notifications === 'on'){
-          var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
-          {'icon': template.settings.notifyIcon,
-          "body" : 'With : ' + data[0].counterparty });
-          notify = false;
-
-          notification.onclick = function(x) {
-            try {
-              window.focus();
-              this.cancel();
-            }
-            catch (ex) {
-            }
-          };
-
-          playSound(template.settings.notifySound);
-
-          setTimeout(function(){
-            notification.close();
-          }, template.settings.notifyTime);
-
-        }
-
+      if (!exists) {
+        $scope.tx.unshift(data[i]);
+        found = true;
+        $scope.$apply();
       }
-
-    })
-    .fail(function() {
-      console.log('could not get tx history');
-    });
-
-  }
-
-
-  // RENDER
-  function render(refresh) {
-    renderLogin(refresh);
-    renderBalance(refresh);
-    renderTx(refresh);
-    renderPay(refresh);
-    renderNames(refresh);
-
-    document.querySelector('paper-tabs').selected = 0;
-
-    $scope.$apply();
-
-  }
-
-  function renderLogin() {
-    $('webid-login').hide();
-  }
-
-
-  function renderBalance(refresh) {
-    fetchBalance(refresh);
-    var description = g.any($rdf.sym(template.settings.wallet), DCT('description'));
-    if (description) {
-      $scope.description = description.value;
     }
-    console.log('description : ' + description);
-  }
 
-  function renderTx(refresh) {
-    fetchTx(refresh);
-  }
 
-  function renderPay() {
+    if (found) {
 
-    // fetch user data
-    f.nowOrWhenFetched(webid.split('#')[0],undefined,function(ok, body){
+      if(notify && template.settings.notifications === 'on'){
+        var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
+        {'icon': template.settings.notifyIcon,
+        "body" : 'With : ' + data[0].counterparty });
+        notify = false;
 
-      //var person = g.statementsMatching($rdf.sym(webid), RDF('type'), FOAF('Person'))[0];
-
-      //console.log(person);
-
-      //var subject = person.subject;
-      subject = $rdf.sym(webid);
-
-      var name = g.any(subject, FOAF('name'));
-      var address = g.any(subject, CURR('bitmark')) || g.any(subject, CURR('bitcoin'));
-/*
-      var knows = g.statementsMatching($rdf.sym(webid), FOAF('knows'), undefined);
-      if ( knows.length > 0 ) {
-        for (var i=0; i<knows.length; i++) {
-          var know = knows[i];
-          //console.log(know.object.value);
-          $scope.friends.push({id: know.object.value, label: know.object.value});
-          if (know.object.value) {
-            f.nowOrWhenFetched(know.object.value.split('#')[0],undefined, function(ok, body) {
-               renderNames();
-            });
+        notification.onclick = function(x) {
+          try {
+            window.focus();
+            this.cancel();
           }
-        }
-        $scope.friend = $scope.friends[0];
+          catch (ex) {
+          }
+        };
 
+        playSound(template.settings.notifySound);
+
+        setTimeout(function(){
+          notification.close();
+        }, template.settings.notifyTime);
 
       }
-*/
-      if (address) {
-        address = address.value;
 
-        $('#withdraw').empty().append('<hr><br>');
-        $('#withdraw').text('Address: ' + address);
+    }
 
-        $('#withdraw').append('<div class="form-group"><input type="text" id="withdrawamount" placeholder="amount" class="form-control"></div>');
-        $('#withdraw').append('<button id="withdrawbutton" type="button" class="btn btn-default">Withdraw</button>');
+  })
+  .fail(function() {
+    console.log('could not get tx history');
+  });
 
-        $( "#withdrawbutton" ).click(function( event ) {
-          var source = $('#source').val();
-          var destination = $('#destination').val();
-          var amount = $('#withdrawamount').val();
+}
 
-          var err = '';
 
-          if(!amount) err +=('Please enter an amount\n');
+// RENDER
+function render(refresh) {
+  renderLogin(refresh);
+  renderBalance(refresh);
+  renderTx(refresh);
+  renderPay(refresh);
+  renderNames(refresh);
 
-          if (isNaN(amount)) err += ('Amount must be a number');
-          amount = parseFloat(amount);
+  document.querySelector('paper-tabs').selected = 0;
 
-          if(err !== '') {
-            alert(err);
-            return false;
+  $scope.$apply();
+
+}
+
+function renderLogin() {
+  $('webid-login').hide();
+}
+
+
+function renderBalance(refresh) {
+  fetchBalance(refresh);
+  var description = g.any($rdf.sym(template.settings.wallet), DCT('description'));
+  if (description) {
+    $scope.description = description.value;
+  }
+  console.log('description : ' + description);
+}
+
+function renderTx(refresh) {
+  fetchTx(refresh);
+}
+
+function renderPay() {
+
+  // fetch user data
+  f.nowOrWhenFetched(webid.split('#')[0],undefined,function(ok, body){
+
+    //var person = g.statementsMatching($rdf.sym(webid), RDF('type'), FOAF('Person'))[0];
+
+    //console.log(person);
+
+    //var subject = person.subject;
+    subject = $rdf.sym(webid);
+
+    var name = g.any(subject, FOAF('name'));
+    var address = g.any(subject, CURR('bitmark')) || g.any(subject, CURR('bitcoin'));
+
+    if (address) {
+      address = address.value;
+
+      $('#withdraw').empty().append('<hr><br>');
+      $('#withdraw').text('Address: ' + address);
+
+      $('#withdraw').append('<div class="form-group"><input type="text" id="withdrawamount" placeholder="amount" class="form-control"></div>');
+      $('#withdraw').append('<button id="withdrawbutton" type="button" class="btn btn-default">Withdraw</button>');
+
+      $( "#withdrawbutton" ).click(function( event ) {
+        var source = $('#source').val();
+        var destination = $('#destination').val();
+        var amount = $('#withdrawamount').val();
+
+        var err = '';
+
+        if(!amount) err +=('Please enter an amount\n');
+
+        if (isNaN(amount)) err += ('Amount must be a number');
+        amount = parseFloat(amount);
+
+        if(err !== '') {
+          alert(err);
+          return false;
+        }
+
+        console.log(amount);
+        console.log(wc);
+
+        var hash = CryptoJS.SHA256(webid).toString();
+
+        function putFile(file, data) {
+          xhr = new XMLHttpRequest();
+          xhr.open('PUT', file, false);
+          xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
+          xhr.send(data);
+        }
+
+
+        var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
+        wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
+        wc += '  <https://w3id.org/cc#destination> \n    <' + address + '> ;\n';
+        wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
+        wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
+
+        putFile(template.settings.inbox + hash + '/1', wc);
+
+
+        $.ajax({
+          url: template.settings.inbox + hash + '/,meta',
+          contentType: "text/turtle",
+          type: 'PUT',
+          data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
+          success: function(result) {
           }
-
-          console.log(amount);
-          console.log(wc);
-
-          var hash = CryptoJS.SHA256(webid).toString();
-
-          function putFile(file, data) {
-            xhr = new XMLHttpRequest();
-            xhr.open('PUT', file, false);
-            xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
-            xhr.send(data);
-          }
-
-
-          var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
-          wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
-          wc += '  <https://w3id.org/cc#destination> \n    <' + address + '> ;\n';
-          wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
-          wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
-
-          putFile(template.settings.inbox + hash + '/1', wc);
-
-
-          $.ajax({
-            url: template.settings.inbox + hash + '/,meta',
-            contentType: "text/turtle",
-            type: 'PUT',
-            data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
-            success: function(result) {
-            }
-          });
-
-          setTimeout(render, 2000);
-
         });
 
-      } else {
-        console.log('Please add a crypto currency address to your profile to allow withdrawls.');
-      }
+        setTimeout(render, 2000);
 
-      console.log(address);
-
-    });
-
-    $scope.$apply();
-  }
-
-  function renderNames() {
-    var i;
-    var name;
-    for (i=0; i<$scope.tx.length; i++) {
-      name = g.any( $rdf.sym($scope.tx[i].counterparty), FOAF('name') );
-      if (name) {
-        $scope.tx[i].name = name.value;
-      }
-    }
-    for (i=0; i<$scope.friends.length; i++) {
-      name = g.any( $rdf.sym($scope.friends[i].id), FOAF('name') );
-      if (name) {
-        $scope.friends[i].name = name.value;
-      }
-    }
-    $scope.$apply();
-  }
-
-
-  function addEvents() {
-    $( "#sendbutton" ).click(function( event ) {
-      var source = $('#source').val();
-      var destination = $('#friendsselect').val();
-      destination = $scope.friend.id;
-      var amount = $('#sendamount').val();
-
-      var err = '';
-
-      if(!amount) err +=('Please enter an amount\n');
-
-      if (isNaN(amount)) err += ('Amount must be a number');
-      amount = parseFloat(amount);
-
-      if(err !== '') {
-        alert(err);
-        return false;
-      }
-
-      console.log(amount);
-
-      var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
-      wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
-      wc += '  <https://w3id.org/cc#destination> \n    <' + destination + '> ;\n';
-      wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
-      wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
-
-
-      var hash = CryptoJS.SHA256(webid).toString();
-
-      function putFile(file, data) {
-        xhr = new XMLHttpRequest();
-        xhr.open('PUT', file, false);
-        xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
-        xhr.send(data);
-      }
-
-      putFile(template.settings.inbox + hash + '/2', wc);
-      console.log(wc);
-
-      $.ajax({
-        url: template.settings.inbox + hash + '/,meta',
-        contentType: "text/turtle",
-        type: 'PUT',
-        data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
-        success: function(result) {
-        }
       });
 
+    } else {
+      console.log('Please add a crypto currency address to your profile to allow withdrawls.');
+    }
+
+    console.log(address);
+
+  });
+
+  $scope.$apply();
+}
+
+function renderNames() {
+  var i;
+  var name;
+  for (i=0; i<$scope.tx.length; i++) {
+    name = g.any( $rdf.sym($scope.tx[i].counterparty), FOAF('name') );
+    if (name) {
+      $scope.tx[i].name = name.value;
+    }
+  }
+  for (i=0; i<$scope.friends.length; i++) {
+    name = g.any( $rdf.sym($scope.friends[i].id), FOAF('name') );
+    if (name) {
+      $scope.friends[i].name = name.value;
+    }
+  }
+  $scope.$apply();
+}
+
+
+function addEvents() {
+  $( "#sendbutton" ).click(function( event ) {
+    var source = $('#source').val();
+    var destination = $('#friendsselect').val();
+    destination = $scope.friend.id;
+    var amount = $('#sendamount').val();
+
+    var err = '';
+
+    if(!amount) err +=('Please enter an amount\n');
+
+    if (isNaN(amount)) err += ('Amount must be a number');
+    amount = parseFloat(amount);
+
+    if(err !== '') {
+      alert(err);
+      return false;
+    }
+
+    console.log(amount);
+
+    var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
+    wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
+    wc += '  <https://w3id.org/cc#destination> \n    <' + destination + '> ;\n';
+    wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
+    wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
+
+
+    var hash = CryptoJS.SHA256(webid).toString();
+
+    function putFile(file, data) {
+      xhr = new XMLHttpRequest();
+      xhr.open('PUT', file, false);
+      xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
+      xhr.send(data);
+    }
+
+    putFile(template.settings.inbox + hash + '/2', wc);
+    console.log(wc);
+
+    $.ajax({
+      url: template.settings.inbox + hash + '/,meta',
+      contentType: "text/turtle",
+      type: 'PUT',
+      data: '<> <http://www.w3.org/ns/posix/stat#mtime> "'+ Math.floor(Date.now() / 1000) +'" . ',
+      success: function(result) {
+      }
     });
 
-  }
+  });
+
+}
 
 
 
 
-  // HELPER
-  function addToArray(array, el) {
-    if (!array) return;
-    if (array.indexOf(el) === -1) {
-      array.push(el);
-    }
-  }
-
-  function addToQueue(array, el) {
-    if (!array) return;
-    if (array.indexOf(el) === -1) {
-      array.push(el);
-    }
-  }
-
-  function addToFriends(array, el) {
-    if (!array) return;
-    for (var i=0; i<array.length; i++) {
-      if (array[i].id === el.id) {
-        return;
-      }
-    }
+// HELPER
+function addToArray(array, el) {
+  if (!array) return;
+  if (array.indexOf(el) === -1) {
     array.push(el);
   }
+}
 
-
-  function playSound(uri) {
-    var sound = new Howl({
-      urls: [uri],
-      volume: 0.9
-    }).play();
-    navigator.vibrate(500);
+function addToQueue(array, el) {
+  if (!array) return;
+  if (array.indexOf(el) === -1) {
+    array.push(el);
   }
+}
 
-
-  $scope.modal = function() {
-    console.info('toggling modal');
-    $scope.printSettings = JSON.stringify(template.settings, null, 2);
-    $('#modal').toggle();
-  };
-
-
-  function connectToSocket(uri, sub, subs) {
-
-    // socket
-    if ( subs.indexOf(sub) !== -1 ) {
-      console.log('Already subscribed to : ' + sub);
-    } else {
-      console.log("Opening socket to : " + uri);
-      subs.push(sub);
-      var socket = new WebSocket(uri);
-
-      socket.onopen = function(){
-        console.log(this);
-        console.log(sub);
-        this.send('sub ' + sub);
-      };
-
-      socket.onmessage = function(msg){
-        console.log('Incoming message : ' + msg);
-
-        render(true);
-
-        Notification.requestPermission(function (permission) {
-          // If the user is okay, let's create a notification
-          if (permission === "granted") {
-            notify = true;
-          }
-        });
-      };
+function addToFriends(array, el) {
+  if (!array) return;
+  for (var i=0; i<array.length; i++) {
+    if (array[i].id === el.id) {
+      return;
     }
   }
+  array.push(el);
+}
+
+
+function playSound(uri) {
+  var sound = new Howl({
+    urls: [uri],
+    volume: 0.9
+  }).play();
+  navigator.vibrate(500);
+}
+
+
+$scope.modal = function() {
+  console.info('toggling modal');
+  $scope.printSettings = JSON.stringify(template.settings, null, 2);
+  $('#modal').toggle();
+};
+
+
+function connectToSocket(uri, sub, subs) {
+
+  // socket
+  if ( subs.indexOf(sub) !== -1 ) {
+    console.log('Already subscribed to : ' + sub);
+  } else {
+    console.log("Opening socket to : " + uri);
+    subs.push(sub);
+    var socket = new WebSocket(uri);
+
+    socket.onopen = function(){
+      console.log(this);
+      console.log(sub);
+      this.send('sub ' + sub);
+    };
+
+    socket.onmessage = function(msg){
+      console.log('Incoming message : ' + msg);
+
+      render(true);
+
+      Notification.requestPermission(function (permission) {
+        // If the user is okay, let's create a notification
+        if (permission === "granted") {
+          notify = true;
+        }
+      });
+    };
+  }
+}
 
 });
