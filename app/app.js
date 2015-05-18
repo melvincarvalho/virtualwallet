@@ -75,8 +75,9 @@ initialize(template, 'wss');
 
 template.queue = [];
 template.settings.seeAlso = [];
-template.settings.wallet  = [];
+template.settings.wallet  = [template.settings.wallet];
 template.settings.subs    = [];
+
 
 
 angular.module("wallet", [])
@@ -89,7 +90,7 @@ angular.module("wallet", [])
   var wss;
 
   if (template.settings.wallet.length) {
-    wss = 'wss://' + template.settings.wallet[0].split('/')[2];
+    wss = 'wss://' + getWallet().split('/')[2];
   }
 
   $scope.balance     = undefined;
@@ -109,7 +110,7 @@ angular.module("wallet", [])
     template.settings.webid = webid;
     $scope.webid = localStorage.getItem('webid');
     hash = CryptoJS.SHA256(webid).toString();
-    var ldpc = template.settings.wallet[0] + hash + '/';
+    var ldpc = getWallet() + hash + '/';
     if (wss) {
       connectToSocket(wss,  ldpc +',meta', subs);
     }
@@ -128,7 +129,7 @@ angular.module("wallet", [])
 
       if(!webid) return;
       hash = CryptoJS.SHA256(webid).toString();
-      var ldpc = template.settings.wallet[0] + hash + '/';
+      var ldpc = getWallet() + hash + '/';
       if (wss) {
         connectToSocket(wss,  ldpc +',meta', subs);
       }
@@ -177,6 +178,11 @@ angular.module("wallet", [])
       addToQueue(template.queue, $scope.tx[i].destination);
     }
 
+    for (i=0; i<template.settings.wallet.length; i++) {
+      //console.log($scope.tx[i].source);
+      addToQueue(template.queue, template.settings.wallet[i]);
+    }
+
   }
 
   function daemon() {
@@ -218,13 +224,13 @@ angular.module("wallet", [])
   function fetchBalance(refresh) {
     if (!refresh && $scope.balance !== undefined) return;
 
-    template.settings.api = g.any($rdf.sym(template.settings.wallet[0]), CURR('api'));
+    template.settings.api = g.any($rdf.sym(getWallet()), CURR('api'));
     if (!template.settings.api) return;
     template.settings.api = template.settings.api.uri;
 
     var hash = CryptoJS.SHA256(template.settings.webid).toString();
-    var ldpc = template.settings.wallet[0].substring(0,template.settings.wallet[0].lastIndexOf("/")+1) + hash + '/';
-    wss = 'wss://' + template.settings.wallet[0].split('/')[2];
+    var ldpc = getWallet().substring(0,getWallet().lastIndexOf("/")+1) + hash + '/';
+    wss = 'wss://' + getWallet().split('/')[2];
     if (wss) {
       connectToSocket(wss,  ldpc + ',meta', template.settings.subs);
     }
@@ -246,7 +252,7 @@ angular.module("wallet", [])
   function fetchTx(refresh) {
     if (!refresh && $scope.tx.length !== 0) return;
 
-    template.settings.api = g.any($rdf.sym(template.settings.wallet[0]), CURR('api'));
+    template.settings.api = g.any($rdf.sym(getWallet()), CURR('api'));
     if (!template.settings.api) return;
     template.settings.api = template.settings.api.uri;
 
@@ -352,7 +358,7 @@ function renderLogin() {
 
 function renderBalance(refresh) {
   fetchBalance(refresh);
-  var description = g.any($rdf.sym(template.settings.wallet[0]), DCT('description'));
+  var description = g.any($rdf.sym(getWallet()), DCT('description'));
   if (description) {
     $scope.description = description.value;
   }
@@ -474,7 +480,13 @@ function renderWallets() {
   for (var i=0; i<template.settings.wallet.length; i++) {
     var uri = template.settings.wallet[i];
     var label = g.any($rdf.sym(template.settings.wallet[i]), DCT('description'));
-    wallets.push({"href": window.location.href.split('?')[0] + '?wallet=' + encodeURIComponent(uri), "label": label.value});
+    if (label) {
+      label = label.value;
+    } else {
+      label = uri;
+    }
+
+    wallets.push({"href": window.location.href.split('?')[0] + '?wallet=' + encodeURIComponent(uri), "label": label});
   }
   $scope.wallets = wallets;
 }
@@ -576,6 +588,11 @@ $scope.modal = function() {
   $scope.printSettings = JSON.stringify(template.settings, null, 2);
   $('#modal').toggle();
 };
+
+function getWallet() {
+  if (template.init.wallet) return template.init.wallet;
+  return template.settings.wallet[0];
+}
 
 
 function connectToSocket(uri, sub, subs) {
