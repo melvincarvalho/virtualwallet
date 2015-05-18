@@ -44,7 +44,7 @@
   <core-toolbar class="medium-tall">
 
     <paper-icon-button icon="menu"></paper-icon-button>
-    <div flex>Virtual Wallet</div>
+    <div flex ng-show="description">{{description}}</div>
     <paper-icon-button icon="search"></paper-icon-button>
     <paper-icon-button ng-click="modal()" id="settings" icon="settings"></paper-icon-button>
 
@@ -70,7 +70,7 @@
           <div class="form-group">
             <webid-login></webid-login>
             <h2 ng-show="webid">{{balance}} {{currency}}</h2>
-            <h4 ng-show="description">({{description}})</h4>
+
           </div>
         </form>
 

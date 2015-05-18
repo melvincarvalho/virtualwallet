@@ -74,6 +74,9 @@ initialize(template, 'webid');
 initialize(template, 'wss');
 
 template.queue = [];
+template.settings.seeAlso = [];
+template.settings.wallet  = [];
+template.settings.subs    = [];
 
 
 angular.module("wallet", [])
@@ -83,26 +86,33 @@ angular.module("wallet", [])
   var subs         = [];
 
   var webid;
+  var wss;
 
-  var wss = 'wss://' + template.settings.wallet.split('/')[2];
+  if (template.settings.wallet.length) {
+    wss = 'wss://' + template.settings.wallet[0].split('/')[2];
+  }
 
-  $scope.balance  = undefined;
-  $scope.selected = 0;
-  $scope.currency = 'bits';
-  $scope.tx       = [];
-  $scope.history  = false;
-  $scope.friends  = [];
-  $scope.webid    = undefined;
+  $scope.balance     = undefined;
+  $scope.selected    = 0;
+  $scope.currency    = 'bits';
+  $scope.description = 'Virtual Wallet';
+  $scope.tx          = [];
+  $scope.history     = false;
+  $scope.friends     = [];
+  $scope.webid       = undefined;
 
 
   // get webid from login or cache
   if (localStorage.getItem('webid')) {
 
     webid = localStorage.getItem('webid');
+    template.settings.webid = webid;
     $scope.webid = localStorage.getItem('webid');
     hash = CryptoJS.SHA256(webid).toString();
-    var ldpc = template.settings.wallet + hash + '/';
-    connectToSocket(wss,  ldpc +',meta', subs);
+    var ldpc = template.settings.wallet[0] + hash + '/';
+    if (wss) {
+      connectToSocket(wss,  ldpc +',meta', subs);
+    }
     template.queue.push(webid);
     fetchAll();
     render();
@@ -112,13 +122,16 @@ angular.module("wallet", [])
     window.addEventListener('WebIDAuth',function(e) {
 
       webid = e.detail.user;
-      $scope.webid= e.detail.user;
+      template.settings.webid = webid;
+      $scope.webid = e.detail.user;
       console.log('WebID is : ' + webid);
 
       if(!webid) return;
       hash = CryptoJS.SHA256(webid).toString();
-      var ldpc = template.settings.wallet + hash + '/';
-      connectToSocket(wss,  ldpc +',meta', subs);
+      var ldpc = template.settings.wallet[0] + hash + '/';
+      if (wss) {
+        connectToSocket(wss,  ldpc +',meta', subs);
+      }
 
       localStorage.setItem('webid', e.detail.user);
       template.queue.push(webid);
@@ -147,8 +160,15 @@ angular.module("wallet", [])
     var wallets = g.statementsMatching($rdf.sym(webid), CURR('wallet'), undefined);
     for (i=0; i<wallets.length; i++) {
       console.log('wallet found : ' + wallets[i].object.value);
-      template.settings.wallet = wallets[i].object.value;
+      addToArray(template.settings.wallet, wallets[i].object.value);
       addToQueue(template.queue, wallets[i].object.value);
+    }
+
+    var seeAlso = g.statementsMatching($rdf.sym(webid), RDFS('seeAlso'), undefined);
+    for (i=0; i<seeAlso.length; i++) {
+      console.log('seeAlso found : ' + seeAlso[i].object.value);
+      addToArray(template.settings.seeAlso, seeAlso[i].object.value);
+      addToQueue(template.queue, seeAlso[i].object.value);
     }
 
     for (i=0; i<$scope.tx.length; i++) {
@@ -198,9 +218,17 @@ angular.module("wallet", [])
   function fetchBalance(refresh) {
     if (!refresh && $scope.balance !== undefined) return;
 
-    template.settings.api = g.any($rdf.sym(template.settings.wallet), CURR('api'));
+    template.settings.api = g.any($rdf.sym(template.settings.wallet[0]), CURR('api'));
     if (!template.settings.api) return;
     template.settings.api = template.settings.api.uri;
+
+    var hash = CryptoJS.SHA256(template.settings.webid).toString();
+    var ldpc = template.settings.wallet[0].substring(0,template.settings.wallet[0].lastIndexOf("/")+1) + hash + '/';
+    wss = 'wss://' + template.settings.wallet[0].split('/')[2];
+    if (wss) {
+      connectToSocket(wss,  ldpc + ',meta', template.settings.subs);
+    }
+
 
     // get balance
     var balanceURI = template.settings.api + 'balance?uri=' + encodeURIComponent(webid);
@@ -218,7 +246,10 @@ angular.module("wallet", [])
   function fetchTx(refresh) {
     if (!refresh && $scope.tx.length !== 0) return;
 
+    template.settings.api = g.any($rdf.sym(template.settings.wallet[0]), CURR('api'));
     if (!template.settings.api) return;
+    template.settings.api = template.settings.api.uri;
+
 
     // get history
     var txURI =  template.settings.api + 'tx?uri=' + encodeURIComponent(webid);
@@ -320,7 +351,7 @@ function renderLogin() {
 
 function renderBalance(refresh) {
   fetchBalance(refresh);
-  var description = g.any($rdf.sym(template.settings.wallet), DCT('description'));
+  var description = g.any($rdf.sym(template.settings.wallet[0]), DCT('description'));
   if (description) {
     $scope.description = description.value;
   }
@@ -536,6 +567,7 @@ $scope.modal = function() {
 
 
 function connectToSocket(uri, sub, subs) {
+  var socket;
 
   // socket
   if ( subs.indexOf(sub) !== -1 ) {
@@ -543,7 +575,7 @@ function connectToSocket(uri, sub, subs) {
   } else {
     console.log("Opening socket to : " + uri);
     subs.push(sub);
-    var socket = new WebSocket(uri);
+    socket = new WebSocket(uri);
 
     socket.onopen = function(){
       console.log(this);
