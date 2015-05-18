@@ -337,6 +337,7 @@ function render(refresh) {
   renderTx(refresh);
   renderPay(refresh);
   renderNames(refresh);
+  renderWallets(refresh);
 
   document.querySelector('paper-tabs').selected = 0;
 
@@ -465,6 +466,17 @@ function renderNames() {
     }
   }
   $scope.$apply();
+}
+
+
+function renderWallets() {
+  var wallets = [];
+  for (var i=0; i<template.settings.wallet.length; i++) {
+    var uri = template.settings.wallet[i];
+    var label = g.any($rdf.sym(template.settings.wallet[i]), DCT('description'));
+    wallets.push({"href": window.location.href.split('?')[0] + '?wallet=' + encodeURIComponent(uri), "label": label.value});
+  }
+  $scope.wallets = wallets;
 }
 
 

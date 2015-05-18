@@ -55,6 +55,7 @@
         <paper-tab>Balance</paper-tab>
         <paper-tab>Pay</paper-tab>
         <paper-tab>Withdraw</paper-tab>
+        <paper-tab>Wallets</paper-tab>
 
       </paper-tabs>
 
@@ -112,6 +113,18 @@
     <form id="create" role="form">
       <div class="form-group">
         <span id="withdraw"></span>
+      </div>
+    </form>
+  </div>
+
+  <div class="tab-pane" lebel="wallets">
+    <form id="create" role="form">
+      <div class="form-group">
+        <span id="wallets"></span>
+        <div ng-repeat="wallet in wallets">
+          <h3><a href="{{wallet['href']}}">{{wallet.label}}</a></h3>
+        </div>
+
       </div>
     </form>
   </div>
