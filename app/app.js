@@ -112,7 +112,7 @@ angular.module("wallet", [])
     hash = CryptoJS.SHA256(webid).toString();
     var ldpc = getWallet() + hash + '/';
     if (wss) {
-      connectToSocket(wss,  ldpc +',meta', subs);
+      connectToSocket(wss,  ldpc , subs);
     }
     template.queue.push(webid);
     fetchAll();
@@ -131,7 +131,7 @@ angular.module("wallet", [])
       hash = CryptoJS.SHA256(webid).toString();
       var ldpc = getWallet() + hash + '/';
       if (wss) {
-        connectToSocket(wss,  ldpc +',meta', subs);
+        connectToSocket(wss,  ldpc , subs);
       }
 
       localStorage.setItem('webid', e.detail.user);
@@ -232,7 +232,7 @@ angular.module("wallet", [])
     var ldpc = getWallet().substring(0,getWallet().lastIndexOf("/")+1) + hash + '/';
     wss = 'wss://' + getWallet().split('/')[2];
     if (wss) {
-      connectToSocket(wss,  ldpc + ',meta', template.settings.subs);
+      connectToSocket(wss,  ldpc , template.settings.subs);
     }
 
 
@@ -261,6 +261,7 @@ angular.module("wallet", [])
     var txURI =  template.settings.api + 'tx?uri=' + encodeURIComponent(webid);
     var jqxhr = $.ajax( txURI )
     .done(function(data) {
+
 
       var found = false;
 
@@ -300,13 +301,21 @@ angular.module("wallet", [])
       }
     }
 
+    renderNames();
 
     if (found) {
 
       if(notify && template.settings.notifications === 'on'){
+        var friend = data[0].counterparty;
+        for (i=0; i<$scope.friends.length; i++) {
+          if ( $scope.friends[i].id === friend && $scope.friends[i].name ) {
+            friend = $scope.friends[i].name;
+          }
+        }
+
         var notification = new Notification('Incoming Payment! (' + data[0].amount + ') of ' + $scope.balance,
         {'icon': template.settings.notifyIcon,
-        "body" : 'With : ' + data[0].counterparty });
+        "body" : 'With : ' + friend });
         notify = false;
 
         notification.onclick = function(x) {
@@ -432,6 +441,7 @@ function renderPay() {
         putFile(template.settings.inbox + hash + '/1', wc);
 
 
+/*
         $.ajax({
           url: template.settings.inbox + hash + '/,meta',
           contentType: "text/turtle",
@@ -440,7 +450,7 @@ function renderPay() {
           success: function(result) {
           }
         });
-
+*/
         setTimeout(render, 2000);
 
       });
@@ -531,7 +541,7 @@ function addEvents() {
 
     putFile(template.settings.inbox + hash + '/2', wc);
     console.log(wc);
-
+/*
     $.ajax({
       url: template.settings.inbox + hash + '/,meta',
       contentType: "text/turtle",
@@ -540,7 +550,7 @@ function addEvents() {
       success: function(result) {
       }
     });
-
+*/
   });
 
 }
