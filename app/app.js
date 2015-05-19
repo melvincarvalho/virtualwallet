@@ -40,7 +40,7 @@ var defaultInbox         = 'https://klaranet.com/d/user/';
 var defaultNotifications = 'on';
 var defaultSound         = 'https://raw.githubusercontent.com/schildbach/bitcoin-wallet/master/wallet/res/raw/coins_received.wav';
 var defaultTime          = 5000;
-var defaultWallet        = 'https://klaranet.com/d/user/';
+var defaultWallet        = 'https://klaranet.com/etc/wallet/main/wallet#wallet';
 
 
 
@@ -321,7 +321,7 @@ angular.module("wallet", [])
         notification.onclick = function(x) {
           try {
             window.focus();
-            document.querySelector('paper-tabs').selected = 0;            
+            document.querySelector('paper-tabs').selected = 0;
             this.cancel();
           }
           catch (ex) {
