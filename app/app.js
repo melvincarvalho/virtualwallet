@@ -321,6 +321,7 @@ angular.module("wallet", [])
         notification.onclick = function(x) {
           try {
             window.focus();
+            document.querySelector('paper-tabs').selected = 0;            
             this.cancel();
           }
           catch (ex) {
@@ -354,7 +355,6 @@ function render(refresh) {
   renderNames(refresh);
   renderWallets(refresh);
 
-  document.querySelector('paper-tabs').selected = 0;
 
   $scope.$apply();
 
