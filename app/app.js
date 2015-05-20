@@ -398,10 +398,11 @@ function renderPay() {
     if (address) {
       address = address.value;
 
-      $('#withdraw').empty().append('<hr><br>');
-      $('#withdraw').text('Address: ' + address);
+      $('#withdraw').empty().append('<h3>Witdraw</h3>');
 
+      $('#withdraw').append('<p>Address: ' + address + '</p>');
       $('#withdraw').append('<div class="form-group"><input type="text" id="withdrawamount" placeholder="amount" class="form-control"></div>');
+      $('#withdraw').append('<p>(Fee = 100)</p>');
       $('#withdraw').append('<button id="withdrawbutton" type="button" class="btn btn-default">Withdraw</button>');
 
       $( "#withdrawbutton" ).click(function( event ) {
