@@ -225,8 +225,10 @@ angular.module("wallet", [])
     if (!refresh && $scope.balance !== undefined) return;
 
     template.settings.api = g.any($rdf.sym(getWallet()), CURR('api'));
+    template.settings.inbox = g.any($rdf.sym(getWallet()), CURR('inbox'));
     if (!template.settings.api) return;
     template.settings.api = template.settings.api.uri;
+    template.settings.inbox = template.settings.inbox.uri;
 
     var hash = CryptoJS.SHA256(template.settings.webid).toString();
     var ldpc = getWallet().substring(0,getWallet().lastIndexOf("/")+1) + 'inbox/' + hash + '/';
@@ -431,6 +433,13 @@ function renderPay() {
           xhr.send(data);
         }
 
+        function postFile(file, data) {
+          xhr = new XMLHttpRequest();
+          xhr.open('PUT', file, false);
+          xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
+          xhr.send(data);
+        }
+
 
         var wc = '<>  a <https://w3id.org/cc#Credit> ;\n';
         wc += '  <https://w3id.org/cc#source> \n    <' + webid + '> ;\n';
@@ -438,7 +447,7 @@ function renderPay() {
         wc += '  <https://w3id.org/cc#amount> "' + amount + '" ;\n';
         wc += '  <https://w3id.org/cc#currency> \n    <https://w3id.org/cc#bit> .\n';
 
-        putFile(template.settings.inbox + hash + '/1', wc);
+        postFile(template.settings.inbox + hash + '/', wc);
 
 
 /*
@@ -539,7 +548,14 @@ function addEvents() {
       xhr.send(data);
     }
 
-    putFile(template.settings.inbox + hash + '/2', wc);
+    function postFile(file, data) {
+      xhr = new XMLHttpRequest();
+      xhr.open('POST', file, false);
+      xhr.setRequestHeader('Content-Type', 'text/turtle; charset=UTF-8');
+      xhr.send(data);
+    }
+
+    postFile(template.settings.inbox + hash + '/', wc);
     console.log(wc);
 /*
     $.ajax({
