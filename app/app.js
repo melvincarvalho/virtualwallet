@@ -110,7 +110,7 @@ angular.module("wallet", [])
     template.settings.webid = webid;
     $scope.webid = localStorage.getItem('webid');
     hash = CryptoJS.SHA256(webid).toString();
-    var ldpc = getWallet() + hash + '/';
+    var ldpc = getWallet() + 'inbox/' + hash + '/';
     if (wss) {
       connectToSocket(wss,  ldpc , subs);
     }
@@ -129,7 +129,7 @@ angular.module("wallet", [])
 
       if(!webid) return;
       hash = CryptoJS.SHA256(webid).toString();
-      var ldpc = getWallet() + hash + '/';
+      var ldpc = getWallet() + 'inbox/' + hash + '/';
       if (wss) {
         connectToSocket(wss,  ldpc , subs);
       }
@@ -229,8 +229,8 @@ angular.module("wallet", [])
     template.settings.api = template.settings.api.uri;
 
     var hash = CryptoJS.SHA256(template.settings.webid).toString();
-    var ldpc = getWallet().substring(0,getWallet().lastIndexOf("/")+1) + hash + '/';
-    wss = 'wss://' + getWallet().split('/')[2];
+    var ldpc = getWallet().substring(0,getWallet().lastIndexOf("/")+1) + 'inbox/' + hash + '/';
+    wss = 'wss://' + getWallet().split('/')[2] ;
     if (wss) {
       connectToSocket(wss,  ldpc , template.settings.subs);
     }
