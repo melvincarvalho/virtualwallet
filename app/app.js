@@ -393,7 +393,7 @@ function renderPay() {
     subject = $rdf.sym(webid);
 
     var name = g.any(subject, FOAF('name'));
-    var address = g.any(subject, CURR('bitmark')) || g.any(subject, CURR('bitcoin'));
+    var address = g.any(subject, CURR('bitcoin'));
 
     if (address) {
       address = address.value;
