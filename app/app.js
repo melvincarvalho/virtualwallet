@@ -625,7 +625,7 @@ function connectToSocket(uri, sub, subs) {
     socket.onmessage = function(msg){
       console.log('Incoming message : ' + msg);
 
-      render(true);
+      setTimeout(function () { render(true); }, 1000);
 
       Notification.requestPermission(function (permission) {
         // If the user is okay, let's create a notification
