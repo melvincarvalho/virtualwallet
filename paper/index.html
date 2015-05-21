@@ -21,7 +21,7 @@ xml:lang="en" lang="en">
     <div id="authors">
       <dl id="author-name">
         <dt>Authors</dt>
-        <dd id="author-1"><span about="http://webid.im/paper/" rel="dcterms:creator dcterms:publisher dcterms:contributor"><a about="http://melvincarvalho.com/#me" typeof="foaf:Person" rel="foaf:homepage" property="foaf:name" href="http://csarven.ca/">Melvin Carvalho</a></span><sup><a href="#author-org-1">1</a></sup></dd>
+        <dd id="author-1"><span about="http://webid.im/paper/" rel="dcterms:creator dcterms:publisher dcterms:contributor"><a about="http://melvincarvalho.com/#me" typeof="foaf:Person" rel="foaf:homepage" property="foaf:name" href="http://melvincarvalho.com/#me">Melvin Carvalho</a></span><sup><a href="#author-org-1">1</a></sup></dd>
       </dl>
 
       <ul id="author-email">
@@ -41,7 +41,7 @@ xml:lang="en" lang="en">
 
     <dl id="document-modified">
       <dt>Modified</dt>
-      <dd property="dcterms:modified" content="2015-04-21T00:00:00Z" datatype="xsd:dateTime">2015-04-21</dd>
+      <dd property="dcterms:modified" content="2015-04-21T00:00:00Z" datatype="xsd:dateTime">2015-05-21</dd>
     </dl>
 
     <dl id="document-license">
@@ -231,16 +231,15 @@ xml:lang="en" lang="en">
                                     <h3 about="[this:#notifications]" property="dcterms:title">Notifications</h3>
                                     <div about="[this:#notifications]" property="dcterms:description">
                                       <p>Notifications are designed to be recieved in realtime.  The typical notification is of a new transaction.
-                                        The transaction history should update in realtime if a payment is sent of received.  A popup will appear on desktop
+                                        The transaction history should update in realtime if a payment is sent or received.  A popup will appear on desktop
                                         machines, as well as a sound effect.  On mobile devices the HTML5 vibrate API will be used.</p>
 
-                                        <p>In order to determine a new transaction, a cache of the previous transactions are kept.  When the new list is pulled in,
+                                        <p>In order to determine when we get a new transaction, a cache of the previous transactions are kept.  When the new list is pulled in,
                                           it is compared with the old list to see if there are any new IDs to be entered.  If so the notifcations function will be triggered.</p>
 
-                                          <p>A new set of transactions is pulled in when a websocket is triggered.  Currently every user has a transactions directory located at a well known location
-                                            (later this will come from the payment provider), then hash(URI) as a subdirectory, and the websocket
-                                            watches for changes in the ",meta" file in that directory using a send of "sub URI".  While this works well now, more work is needed on a global
-                                            decentralized notification system, perhaps using streaming data.  The websocket is located at the root of the payment pfovoder, or should be returned in the
+                                          <p>A new set of transactions is pulled in when a websocket is triggered.  The API is called for a list of per user transactions, which is discovered from the wallet URI. A websocket
+                                            watches for changes in the inbox using a send of "sub URI".  While this works well now, more work is needed on a global
+                                            decentralized notification system, perhaps using streaming data.  The websocket is located at the root of the payment provider, or should be returned in the
                                             Updates-Via header.</p>
 
                                           </div>
