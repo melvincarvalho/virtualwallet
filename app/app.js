@@ -63,6 +63,7 @@ function initialize(template, key, init) {
 
 initialize(template, 'api', 'http://klaranet.com/api/v1/');
 initialize(template, 'inbox', defaultInbox);
+initialize(template, 'lastConnect');
 initialize(template, 'ldpc');
 initialize(template, 'notifications', defaultNotifications);
 initialize(template, 'notifyIcon', defaultIcon);
@@ -637,6 +638,12 @@ function connectToSocket(uri, sub, subs) {
       console.log(this);
       console.log(sub);
       this.send('sub ' + sub);
+      template.settings.connection = 'connected';
+    };
+
+    socket.close = function(){
+      console.log('Connection closed');
+      template.settings.connection = 'disconnected';
     };
 
     socket.onmessage = function(msg){
