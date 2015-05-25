@@ -34,12 +34,11 @@
     "core-toolbar": "Polymer/core-toolbar#^0.5.0",
     "paper-tabs": "Polymer/paper-tabs#^0.5.0",
     "core-ajax": "Polymer/core-ajax#^0.5.0",
-    "paper-button": "Polymer/paper-button#~0.5.2",
+    "paper-button": "Polymer/paper-button#~0.5.4",
     "paper-spinner": "Polymer/paper-spinner#~0.5.2",
     "core-overlay": "Polymer/core-overlay#~0.5.2",
     "core-transition": "Polymer/core-transition#~0.5.2",
     "paper-toggle-button": "Polymer/paper-toggle-button#~0.5.4",
-    "paper-button": "Polymer/paper-button#~0.5.4",
     "paper-dialog": "Polymer/paper-dialog#~0.5.4",
     "paper-dropdown-menu": "Polymer/paper-dropdown-menu#~0.5.4",
     "flag-icon": "~0.9.0",
@@ -48,8 +47,7 @@
     "angularjs": "~1.4.0",
     "materialize": "~0.95.2",
     "ng-file-upload": "~3.0.7",
-    "ngImgCrop": "~0.3.2"
-
-
+    "ngImgCrop": "~0.3.2",
+    "rdfstore": "~0.9.6"
   }
 }

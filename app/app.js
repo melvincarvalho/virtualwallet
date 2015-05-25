@@ -24,6 +24,11 @@ $rdf.Fetcher.crossSiteProxyTemplate=PROXY;
 var g = $rdf.graph();
 var f = $rdf.fetcher(g);
 
+var store = new rdfstore.Store(function(err, store) {
+  // the new store is ready
+  console.log('started rdfstore');
+});
+
 
 var template      = {};
 document.template = template;
@@ -207,6 +212,7 @@ angular.module("wallet", [])
     //if (template.queue.length === 0) return;
 
     for (var i=0; i<template.queue.length; i++) {
+      console.log(' getting ' + template.queue[i]);
       if (f.getState(template.queue[i].split('#')[0]) === 'unrequested') {
         fetch(template.queue[i]);
       }
@@ -216,10 +222,40 @@ angular.module("wallet", [])
 
   function fetch(uri) {
     console.log('fetching ' + uri);
-    f.nowOrWhenFetched(uri.split('#')[0],undefined, function(ok, body) {
+    console.log(g);
+
+    var why = uri.split('#')[0];
+    var l = localStorage.getItem(why);
+    if (l) {
+      var triples = JSON.parse(l);
+      for (var i=0; i<triples.length; i++) {
+        g.add( $rdf.sym(triples[i].subject.value), $rdf.sym(triples[i].predicate.value), $rdf.term(triples[i].object.value), $rdf.sym(triples[i].why.value) );
+      }
+      console.log(triples);
+      var index = template.queue.indexOf(uri);
+      console.log('length of queue : ' + template.queue.length);
+      //if (index > -1) {
+      //  console.log('length of queue : ' + template.queue.length);
+      //  template.queue.splice(index, 1);
+      //}
+      render();
+      f.requested[why] = 'requested';
+      fetchAll();
+      return;
+    }
+    f.nowOrWhenFetched(why, undefined, function(ok, body) {
+      cache(uri);
       render();
       fetchAll();
     });
+  }
+
+  function cache(uri) {
+    console.log('caching ' + uri);
+    var why = uri.split('#')[0];
+    var triples = g.statementsMatching(undefined, undefined, undefined, $rdf.sym(why));
+    localStorage.setItem(why, JSON.stringify(triples));
+    console.log(triples);
   }
 
   function fetchBalance(refresh) {
@@ -230,6 +266,7 @@ angular.module("wallet", [])
     if (!template.settings.api) return;
     template.settings.api = template.settings.api.uri;
     template.settings.inbox = template.settings.inbox.uri;
+    if (!template.settings.api) return;
 
     var hash = CryptoJS.SHA256(template.settings.webid).toString();
     var ldpc = getWallet().substring(0,getWallet().lastIndexOf("/")+1) + 'inbox/' + hash + '/';
@@ -258,6 +295,7 @@ angular.module("wallet", [])
     template.settings.api = g.any($rdf.sym(getWallet()), CURR('api'));
     if (!template.settings.api) return;
     template.settings.api = template.settings.api.uri;
+    if (!template.settings.api) return;
 
 
     // get history
@@ -359,7 +397,7 @@ function render(refresh) {
   renderWallets(refresh);
 
 
-  $scope.$apply();
+  //$scope.$apply();
 
 }
 
@@ -474,7 +512,7 @@ function renderPay() {
 
   });
 
-  $scope.$apply();
+  //$scope.$apply();
 }
 
 function renderNames() {
@@ -492,7 +530,7 @@ function renderNames() {
       $scope.friends[i].name = name.value;
     }
   }
-  $scope.$apply();
+  //$scope.$apply();
 }
 
 
@@ -586,6 +624,7 @@ function addToArray(array, el) {
 
 function addToQueue(array, el) {
   if (!array) return;
+  if (!el) return;
   if (array.indexOf(el) === -1) {
     array.push(el);
   }
