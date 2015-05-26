@@ -264,8 +264,8 @@ angular.module("wallet", [])
     template.settings.api = g.any($rdf.sym(getWallet()), CURR('api'));
     template.settings.inbox = g.any($rdf.sym(getWallet()), CURR('inbox'));
     if (!template.settings.api) return;
-    template.settings.api = template.settings.api.uri;
-    template.settings.inbox = template.settings.inbox.uri;
+    template.settings.api = template.settings.api.value;
+    template.settings.inbox = template.settings.inbox.value;
     if (!template.settings.api) return;
 
     var hash = CryptoJS.SHA256(template.settings.webid).toString();
@@ -294,7 +294,7 @@ angular.module("wallet", [])
 
     template.settings.api = g.any($rdf.sym(getWallet()), CURR('api'));
     if (!template.settings.api) return;
-    template.settings.api = template.settings.api.uri;
+    template.settings.api = template.settings.api.value;
     if (!template.settings.api) return;
 
 
