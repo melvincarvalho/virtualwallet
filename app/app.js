@@ -94,6 +94,7 @@ angular.module("wallet", [])
 
   var webid;
   var wss;
+  var socket;
 
   if (template.settings.wallet.length) {
     wss = 'wss://' + getWallet().split('/')[2];
@@ -197,6 +198,7 @@ angular.module("wallet", [])
     setInterval(function() {
 
       console.log('ping');
+      socket.send('ping');
 
       render();
 
@@ -663,7 +665,6 @@ function getWallet() {
 
 
 function connectToSocket(uri, sub, subs) {
-  var socket;
 
   // socket
   if ( subs.indexOf(sub) !== -1 ) {
@@ -686,7 +687,10 @@ function connectToSocket(uri, sub, subs) {
     };
 
     socket.onmessage = function(msg){
-      console.log('Incoming message : ' + msg);
+      console.log('Incoming message : ');
+      console.log(msg);
+
+      if (msg === 'pong') return;
 
       setTimeout(function () { render(true); }, 1000);
 
