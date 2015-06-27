@@ -1,3 +1,8 @@
+var f,g;
+var db;
+var template;
+
+
 // Globals
 var PROXY = "https://rww.io/proxy.php?uri={uri}";
 var TIMEOUT = 90000;
@@ -21,8 +26,8 @@ var UI     = $rdf.Namespace("http://www.w3.org/ns/ui#");
 
 $rdf.Fetcher.crossSiteProxyTemplate=PROXY;
 
-var g = $rdf.graph();
-var f = $rdf.fetcher(g);
+g = $rdf.graph();
+f = $rdf.fetcher(g);
 
 var store = new rdfstore.Store(function(err, store) {
   // the new store is ready
@@ -30,7 +35,7 @@ var store = new rdfstore.Store(function(err, store) {
 });
 
 
-var template      = {};
+template      = {};
 document.template = template;
 
 
@@ -231,7 +236,14 @@ angular.module("wallet", [])
     if (l) {
       var triples = JSON.parse(l);
       for (var i=0; i<triples.length; i++) {
-        g.add( $rdf.sym(triples[i].subject.value), $rdf.sym(triples[i].predicate.value), $rdf.term(triples[i].object.value), $rdf.sym(triples[i].why.value) );
+        var t = triples[i].object.uri;
+        if (t) {
+          t = $rdf.sym(triples[i].object.value);
+        } else {
+          t = $rdf.term(triples[i].object.value);
+        }
+
+        g.add( $rdf.sym(triples[i].subject.value), $rdf.sym(triples[i].predicate.value), t, $rdf.sym(triples[i].why.value) );
       }
       console.log(triples);
       var index = template.queue.indexOf(uri);
