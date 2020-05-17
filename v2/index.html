@@ -8,26 +8,6 @@
     <script type="module">
       import { html, render } from 'https://spux.org/web_modules/spux.js'
 
-      const RandomImage = () =>
-        html`
-          <img
-            src="https://picsum.photos/400/300/?random=${Math.random()}"
-            class="w-100"
-          />
-        `
-
-      const CardComponent = () => html`
-        <div class="card col">
-          <${RandomImage} />
-          <h4>Card Title</h4>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-          </p>
-          <button class="btn">Okay</button>
-          <button class="btn primary">Cancel</button>
-        </div>
-      `
-
       render(
         html`
           <h2>LNBits</h2>
@@ -70,4 +50,3 @@
     </script>
   </body>
 </html>
-
