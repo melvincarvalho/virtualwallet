@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <title>card component</title>
+    <link rel="stylesheet" href="https://spux.org/css/spux.css" />
+  </head>
+
+  <body>
+    <script type="module">
+      import { html, render } from 'https://spux.org/web_modules/spux.js'
+
+      const RandomImage = () =>
+        html`
+          <img
+            src="https://picsum.photos/400/300/?random=${Math.random()}"
+            class="w-100"
+          />
+        `
+
+      const CardComponent = () => html`
+        <div class="card col">
+          <${RandomImage} />
+          <h4>Card Title</h4>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+          </p>
+          <button class="btn">Okay</button>
+          <button class="btn primary">Cancel</button>
+        </div>
+      `
+
+      render(
+        html`
+          <h2>LNBits</h2>
+          <hr />
+          <div class="row">
+            <div class="col card 3">
+              <div class="row">wallet</div>
+              <div class="row">wallet 1</div>
+              <div class="row">wallet 2</div>
+              <div class="row">ext</div>
+              <div class="row">ext 1</div>
+              <div class="row">ext 2</div>
+            </div>
+
+            <div class="col card">
+              <div class="row"><h1>1010 sats</h1></div>
+              <div class="row">
+                <div class="btn col primary">Send</div>
+                <div class="btn col primary">Recieve</div>
+              </div>
+              <hr />
+              <div class="row"><h2>Transactions</h2></div>
+              <div class="row">
+                <div class="col 2">Memo</div>
+                <div class="col 2">Date</div>
+                <div class="col 2">Amount</div>
+              </div>
+              <hr />
+              <div class="row">
+                <div class="col 2">Test</div>
+                <div class="col 2">2020-05-13 22:50</div>
+                <div class="col 2">99</div>
+              </div>
+            </div>
+            <div class="col card 3">keys</div>
+          </div>
+        `,
+        document.body
+      )
+    </script>
+  </body>
+</html>
+
